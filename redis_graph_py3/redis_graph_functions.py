@@ -82,42 +82,50 @@ class Build_Configuration(Basic):
        
        redis_string =  self._convert_namespace(new_name_space)
 
-       self.redis_handle.hset(redis_string,"namespace",redis_string)
-       self.update_relationship( relationship, label, redis_string )
+       self.redis_handle.hset(redis_string,"namespace",json.dumps(redis_string))
+       self.redis_handle.hset(redis_string,"name",json.dumps(label))
+       self.update_relationship( new_name_space, redis_string )
        return redis_string, new_name_space
 
 
    def make_string_key( self, relationship,label):
        return relationship+self.rel_sep+label+self.label_sep
  
-   def update_relationship( self, relationship, label, redis_string ):
-       self.redis_handle.sadd("@RELATIONSHIPS",relationship)
-       self.redis_handle.sadd("%"+relationship,redis_string)
-       self.redis_handle.sadd("#"+relationship+self.rel_sep+label,redis_string)
+   def update_relationship( self, new_name_space, redis_string ):
+       for relationship,label in new_name_space:
+           #print( relationship,label,redis_string)
+           self.redis_handle.sadd("@RELATIONSHIPS",relationship)
+           self.redis_handle.sadd("%"+relationship,redis_string)
+           self.redis_handle.sadd("#"+relationship+self.rel_sep+label,redis_string)
 
 
  
    def store_keys( self ):
-       self.redis_handle.sadd("@GRAPH_KEYS", self.keys )
+       for i in self.keys:
+            self.redis_handle.sadd("@GRAPH_KEYS", i )
 
 
 
    def delete_all(self): #tested
        self.redis_handle.flushdb()
 
-class Query_Configuration(Build_Configuration):
+class Query_Configuration(Basic):
 
    def __init__( self, redis_handle):
-        super(Basic, self).__init__(redis_handle)   
+        super().__init__(redis_handle)   
 
    def match_relationship( self, relationship, label= None , starting_set = None ):
        return_value = None
        if starting_set == None:
           starting_set = redis_handle.smembers("@GRAPH_KEYS")
-      
+       #print("starting set",starting_set)#
        if label == None:
+          #print("made it here")
           if redis_handle.sismember( "@RELATIONSHIPS", relationship) == True:
-              return_value = redis_handle.smembers("%"+relationship)
+              #print("made it here #2") 
+              return_value = set(redis_handle.smembers("%"+relationship))
+              #print("return_value 1",return_value)
+              #print( starting_set)
               return_value = return_value.intersection(starting_set)
        
        else:
@@ -133,7 +141,8 @@ class Query_Configuration(Build_Configuration):
        for i in list(starting_set):
            flag = True
            for j , value in property_values.items():
-               data = redis_handle.hmget(i,j)
+               data = redis_handle.hget(i,j).decode("utf-8")
+              
                if data == None:
                    flag = False
                    break
@@ -146,10 +155,10 @@ class Query_Configuration(Build_Configuration):
        return return_value
 
    def match_relationship_list ( self, relationship_list, starting_set = None, property_values = None, fetch_values = True ):
-      for i ,value in relationship_list.items():  
-          starting_set = self.match_relationship( value[0], value[1], starting_set )
+      for relationship ,label in relationship_list:  
+          starting_set = self.match_relationship( relationship, label, starting_set )
       if property_values != None:
-         starting_set = match_properties( starting_set, property_values )
+         starting_set = self.match_properties( starting_set, property_values )
       if fetch_values == True:
            return_value = self.return_data( starting_set)
       else:
@@ -159,15 +168,18 @@ class Query_Configuration(Build_Configuration):
 
    def return_data( self, key_set ):
        return_value = []
-       for i in keys_set:
+       for i in key_set:
            data = self.redis_handle.hgetall(i)
+           
            temp = {}
            for j in data.keys():
+
                try:
-                   temp[j] = json.loads(data[j])
+                   temp[j.decode("utf-8")] = json.loads(data[j].decode("utf-8") )
                except:
-                   temp[j] = data[j]
-               return_value.append(temp)
+                   #print("exception")
+                   temp[j.decode("utf-8")] = data[j].decode("utf-8")
+           return_value.append(temp)
        return return_value
 
 
@@ -180,7 +192,9 @@ class Query_Configuration(Build_Configuration):
 if __name__ == "__main__":
    redis_handle  = redis.StrictRedis( host = "127.0.0.1", port=6379, db = 11 )   
 
-   bc = Build_Configuration( redis_handle)   
+   bc = Build_Configuration( redis_handle)  
+   qc = Query_Configuration(redis_handle)
+ 
    bc.construct_node( True, "HEAD","HEAD",{})
    bc.construct_node( True, "Level_1","level11",{})
    bc.construct_node( True, "Level_2","level21",{} )
@@ -188,12 +202,23 @@ if __name__ == "__main__":
    bc.construct_node( True, "Level_2","level12",{})
    bc.construct_node( True, "Level_3","level33",{} )
    bc.store_keys()
-   print ("nodes ",redis_handle.keys("*]"))
-   print ("system",redis_handle.keys("@*"))
-   print ("relations",redis_handle.keys("%*"))
-   print ("labels",redis_handle.keys("#*"))
+   #print ("nodes ",redis_handle.keys("*]"))
+   #print ("system",redis_handle.keys("@*"))
+   #print ("relations",redis_handle.keys("%*"))
+   #print ("labels",redis_handle.keys("#*"))
 
   
-   print ("all redis keys", redis_handle.keys("*"))
-
-
+   #print ("all redis keys", redis_handle.keys("*"))
+   print("single relationship", qc.match_relationship("Level_1"))
+   print("single relationship-label", qc.match_relationship("Level_3","level33"))
+   x =  qc.match_relationship_list( [["Level_1","level11"],["Level_2","level12"]],fetch_values= True)
+   print ("multiple relationship")
+   for i in x:
+     print( i )
+   x = qc.match_relationship_list( [["Level_1","level11"]],property_values={"name":"level21"},fetch_values= True)
+   print ("multiple relationship")
+   for i in x:
+     print( i )
+   new_properties = {"speed":10,"acc":32.2 }
+   qc.modify_properties( '[HEAD:HEAD][Level_1:level11][Level_2:level21]', new_properties)
+   print( redis_handle.hgetall('[HEAD:HEAD][Level_1:level11][Level_2:level21]'))
