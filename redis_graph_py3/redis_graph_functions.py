@@ -84,6 +84,7 @@ class Build_Configuration(Basic):
 
        self.redis_handle.hset(redis_string,"namespace",json.dumps(redis_string))
        self.redis_handle.hset(redis_string,"name",json.dumps(label))
+       self.update_terminals( relationship, label, redis_string)
        self.update_relationship( new_name_space, redis_string )
        return redis_string, new_name_space
 
@@ -97,6 +98,11 @@ class Build_Configuration(Basic):
            self.redis_handle.sadd("@RELATIONSHIPS",relationship)
            self.redis_handle.sadd("%"+relationship,redis_string)
            self.redis_handle.sadd("#"+relationship+self.rel_sep+label,redis_string)
+
+   def update_terminals( self, relationship,label, redis_string ):
+       self.redis_handle.sadd("@TERMINALS",relationship)
+       self.redis_handle.sadd("&"+relationship,redis_string)
+       self.redis_handle.sadd("$"+relationship+self.rel_sep+label,redis_string)
 
 
  
@@ -113,6 +119,34 @@ class Query_Configuration(Basic):
 
    def __init__( self, redis_handle):
         super().__init__(redis_handle)   
+
+   def match_terminal_relationship( self, relationship, label= None , starting_set = None,property_values = None, data_flag = True ):
+       return_value = None
+       if starting_set == None:
+          starting_set = redis_handle.smembers("@GRAPH_KEYS")
+       #print("starting set",starting_set)#
+       if label == None:
+          #print("made it here")
+          if redis_handle.sismember( "@TERMINALS", relationship) == True:
+              #print("made it here #2") 
+              return_value = set(redis_handle.smembers("&"+relationship))
+              #print("return_value 1",return_value)
+              #print( starting_set)
+              return_value = return_value.intersection(starting_set)
+       
+       else:
+          if redis_handle.sismember( "@TERMINALS", relationship) == True:
+               if redis_handle.exists("$"+relationship+self.rel_sep+label) == True:
+                   return_value = redis_handle.smembers("$"+relationship+self.rel_sep+label)
+                   return_value = return_value.intersection(starting_set)
+
+       if (property_values != None) and (return_value != None):
+          return_value = self.match_properties( return_value , property_values )
+
+       if data_flag == True:
+           return_value = self.return_data( return_value)
+       return return_value
+
 
    def match_relationship( self, relationship, label= None , starting_set = None ):
        return_value = None
@@ -140,16 +174,16 @@ class Query_Configuration(Basic):
        return_value = []
        for i in list(starting_set):
            flag = True
-           for j , value in property_values.items():
+           for j , value in property_values.items(): 
                data = redis_handle.hget(i,j).decode("utf-8")
-              
                if data == None:
                    flag = False
                    break
-               if json.loads(data) != str(value):
+               
+               if json.loads(data) != value:
                    flag = False
                    break
-              
+ 
            if flag == True:
                return_value.append( i)
        return return_value
@@ -188,6 +222,11 @@ class Query_Configuration(Basic):
        for i , value in new_properties.items():
          self.redis_handle.hset(redis_key,i, value )
 
+   def form_dict_from_list( self, list_set, dict_property ):
+       return_value = {}
+       for i in list_set:
+           return_value[i[dict_property]] = i
+       return return_value
       
 if __name__ == "__main__":
    redis_handle  = redis.StrictRedis( host = "127.0.0.1", port=6379, db = 11 )   
@@ -222,3 +261,11 @@ if __name__ == "__main__":
    new_properties = {"speed":10,"acc":32.2 }
    qc.modify_properties( '[HEAD:HEAD][Level_1:level11][Level_2:level21]', new_properties)
    print( redis_handle.hgetall('[HEAD:HEAD][Level_1:level11][Level_2:level21]'))
+   print (qc.match_terminal_relationship( "Level_2", label= None , starting_set = None ))
+   print (qc.match_terminal_relationship( "Level_2", label= "level21" , starting_set = None ))
+   print (qc.match_terminal_relationship( "Level_2", label= None , starting_set = None ,data_flag = False))
+   print (qc.match_terminal_relationship( "Level_2", label= "level21" , starting_set = None,data_flag = False ))
+   pv = {"speed":10,"acc":32.2}
+   print (qc.match_terminal_relationship( "Level_2", label= "level21" ,property_values = pv, starting_set = None ))
+   
+   
