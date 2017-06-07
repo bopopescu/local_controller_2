@@ -1,0 +1,4 @@
+git push origin master
+#git remote add vc https://onyxengr.visualstudio.com/DefaultCollection/_git/local_irrigation
+#git remote -v
+#git pull origin vc

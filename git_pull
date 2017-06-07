@@ -1,0 +1,6 @@
+git remote add origin  https://github.com/glenn-edgar/local_controller_2
+git remote -v
+git pull origin master
+#git remote add vc https://onyxengr.visualstudio.com/DefaultCollection/_git/local_irrigation
+#git remote -v
+#git pull origin vc
