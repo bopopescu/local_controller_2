@@ -262,8 +262,7 @@ class Graph_Management():
 
    def find_remotes( self  ):
       data = self.qc.match_terminal_relationship( "REMOTE_UNIT", label= None , starting_set = None )
-      if data | = None:
-         data = 
+ 
       return data
 
 
@@ -280,8 +279,7 @@ class Graph_Management():
    def find_data_stores( self ):
        data = self.match_relationship("DATA_STORE")
        data = self.qc.match_relationship( "DATA_STORE", label= None , starting_set = None )
-      return data
-      return data
+       return data
 
    def find_io_servers( self ):
       data = self.qc.match_relationship( "UDP_IO_SERVER", label= None , starting_set = None )
@@ -301,7 +299,7 @@ class Graph_Management():
            return self.cb_handlers.has_key(tag)
        except:
           #print "handlers:", type(self.cb_handlers)
-          print "tag", tag
+          #print "tag", tag
           raise        
 
    def execute_cb_handlers( self, tag, value, parameters ):  # parameters is a list

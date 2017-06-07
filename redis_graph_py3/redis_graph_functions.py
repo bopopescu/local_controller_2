@@ -30,7 +30,9 @@ class Build_Configuration(Basic):
    def pop_namespace( self ):
        del self.namespace[-1]    
 
-   def add_header_node( self, relation,label, properties = {}, json_flag= True ):
+   def add_header_node( self, relation,label=None, properties = {}, json_flag= True ):
+     if label== None:
+        label = relation
      properties["name"] = label
      self.construct_node( True, relation, label, properties, json_flag )
 
@@ -44,7 +46,7 @@ class Build_Configuration(Basic):
        #print ("name space is in balance")
       
    def add_info_node( self, relation,label, properties = {}, json_flag= True ):
-     properties["name"] = label
+     
      
      self.construct_node( False, relation,  label, properties, json_flag )
 
