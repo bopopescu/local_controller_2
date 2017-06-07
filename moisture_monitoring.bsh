@@ -1,0 +1,12 @@
+while [ 1 ]
+do
+   for i in {1..60}
+   do
+       echo "executing moisture monitoring $i"
+       /usr/bin/python moisture_monitoring.py  2>  /tmp/moisture_monitoring.err   
+     
+        mv /tmp/moisture_monitoring.err /tmp/moisture_monitoring.errr
+        sleep 5
+   done
+   python cloud_event_queue.py "reboot" "moisture_monitorin"
+done

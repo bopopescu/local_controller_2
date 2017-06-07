@@ -1,0 +1,45 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+	<title>Web Monitoring Program</title>
+	<link rel="stylesheet"  href="/css/jquery.mobile-1.0a4.1.min.css" />
+
+	<script type="text/javascript" src="/js/jquery-2.0.1.js"></script>
+	<script type="text/javascript" src="/js/jquery.mobile-1.3.1.js"></script>
+	<script type="text/javascript" src="/js/eto_handler.js"></script>
+</head> 
+
+<body> 
+
+<div data-role=page id=home>
+  
+ <h3>Edit ETO Data</h3>
+ <a href="index.html"  data-role="button" target="_self">Back</a><br>
+ <h3>Select Action For Checked Enities</h3> 
+ <select id="op_mode">
+            <option selected value=0>No Action</option>
+	    <option value=1>Zero Selected ETO Data</option>
+	    <option value=2>Subtract .05 inch from ETO Data</option>
+	    <option value=3>Add .05 inch from ETO Data</option>
+	    <option value=4>Select All Elements</option>
+	    <option value=5>Unselect All Elememts</option>
+	    <option value=6>Reset ETO Data</option>
+	    <option value=7>Save ETO Data</option>
+	    
+  </select>
+  <div id="eto_list">
+  </div>
+ 
+ 
+  
+</div> 
+
+</body>
+</html>
+
+
+
+
+

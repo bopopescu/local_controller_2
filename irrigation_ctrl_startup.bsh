@@ -1,0 +1,9 @@
+while [ 1 ]
+do
+   echo "irrigation control"
+   /usr/bin/python irrigation_ctrl_startup.py 2>  /tmp/irrigation_ctrl_startup.err 
+   python cloud_event_queue.py "reboot" "irrigation_ctrl_startup.py"
+   mv /tmp/irrigation_ctrl_startup.err /tmp/irrigation_ctrl_startup.errr
+   echo "irrigation error"
+   sleep 10
+done

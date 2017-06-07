@@ -1,0 +1,43 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+	<title>Web Monitoring Program</title>
+	<link rel="stylesheet"  href="/css/jquery.mobile-1.3.1.min.css" />
+        <script type="text/javascript" src="/js_library/jquery-2.0.1.js"></script>
+	<script type="text/javascript" src="/js_library/jquery.mobile-1.3.1.js"></script>
+	<script type="text/javascript" src="/js_library/dygraph-combined.js"></script>
+        <script type="text/javascript" src="/js/average_history_coil_rate.js"></script>
+
+</head> 
+<body> 
+
+<div data-role="page">
+
+    <div data-role="header">
+	<h1>Time History Coil Current Rate</h1>
+    </div><!-- /header -->
+       <div data-role="navbar">
+       
+       <ul>
+		<li><a href="/index.html" target="_self">Home Page</a></li>
+		<li><a id = "back" href='/statistics_home_page.html' class="ui-btn-active ui-state-persist" target="_self">Statistics Home Page</a></li>
+	</ul>
+	
+
+   
+    <select id="Flow_Schedule">
+    </select>
+    <select id="Flow_Step">
+    </select>
+    <label for=limit_enable  >Show Limit Values</label>
+    <input type=checkbox   id=limit_enable>
+    
+    
+    <br><h3>Graph of Average Coil Current</h3>
+    <div id="div_g_flow" style="width:600px; height:400px;"></div>
+
+    
+</div>
+</div><!-- /page -->
+</html>

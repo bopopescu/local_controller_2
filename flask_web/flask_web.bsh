@@ -1,0 +1,5 @@
+while [ 1 ]
+do
+   
+   sudo /usr/bin/python manage.py
+done

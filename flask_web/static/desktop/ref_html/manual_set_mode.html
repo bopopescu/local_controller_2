@@ -1,0 +1,93 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+	<title>Web Monitoring Program</title>
+	<link rel="stylesheet"  href="/css/jquery.mobile-1.0a4.1.min.css" />
+
+	<script type="text/javascript" src="/js/jquery-2.0.1.js"></script>
+	<script type="text/javascript" src="/js/jquery.mobile-1.3.1.js"></script>
+	<script type="text/javascript" src="/js/manual_set_mode.js"></script>
+</head> 
+<body> 
+  <section id = "manual_page" data-role="page">
+    <header data-role = "header" >
+      
+       <div data-role="navbar">
+	<ul>
+		<li><a href="index.html" target="_self">Operations</a></li>
+		<li><a href="configure_mode.html" target="_self" >Config</a></li>
+		<li><a href="admin.html"  target="_self">Sys Admin</a></li>
+	</ul>
+      </div>
+      <div data-role="navbar">
+	<ul>
+
+		<li><a href="index.html" target="_self">System State</a></li>
+		<li><a href="alarms.html" target="_self">Alarm Page</a></li>
+	        <li><a href="manual_set_mode.html" target="_self" > Manual Operations</a></li>
+		<li><a href="overall_statistics.html" target="_self" >Statistics</a></li>
+
+	</ul>
+     </div>     
+     <div data-role="navbar">
+	<ul>
+		<li><a href="manual_set_mode.html" target="_self" > Change Operating Mode</a></li>
+		<li><a href="manual_mode_raw.html" target="_self">Controller Pin Schedule </a></li>
+		<li><a href="manual_rain_day.html" target="_self">Rain Day / Derating Factor</a></li>
+                <li><a href="manual_flow_limit.html" target="self">Manage Flow Limit</a></li>
+                <li><a href="manual_current_limit.html" target="self">Manage Current Limits</a></li>
+		
+		
+	</ul>
+     </div>
+    </header>
+    <center>
+    <h1>Operations/ Manual Operations / Change Mode</h1>
+    </center>
+    <div data-role="content" class="content" >
+         <h3>Current Operating Mode is: </h3> 
+     
+         <h3>Select Operating Mode</h3> 
+	<select id="op_mode">
+	    <option selected value=0>Auto Mode</option>
+	    <option value=1>Offline</option>
+	    <option value=2>Queue Schedule</option>
+	    <option value=3>Queue Schedule Step</option>
+	    <option value=4>Queue Schedule Step Time</option>
+	    <option value=5>Manual Mode Schedule</option>
+	    <option value=6>Manual Mode Schedule Step</option>
+	    <option value=7>Manual Mode Schedule Step Time</option> 
+	    <option value=8>Clean Filter</option> 
+	    <option value=9>Open Master Valve</option>
+	    <option value=10>Close Master Valve</option> 
+	</select>
+	  
+	<div id = "schedule_div">
+        <h3 id="schedule_label">Select Schedule</h3> 
+	<select id="manual_schedule">
+	</select>
+        </div>
+        <div id ="manual_div">
+        <h3 id="step_label">Select step</h3> 
+	<select id="manual_step">
+	</select>
+	</div>
+       <div id = "run_div"> 
+       <h3 id ="run_label">Select Run Time (1 to 60 Minutes) </h3> 
+       <select id="run_time">
+        </select>
+        </div>
+        <h3><br><br>Click to Change Schedule Modifier</h3>
+         <button type="button" id="change_mode">Click to Change Mode Mode</button>  
+  </section>
+
+
+ 
+  
+  
+
+  
+ 
+</body>
+</html>

@@ -1,0 +1,47 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Create/Edit/Delete/Schedules</title>
+  <link rel="stylesheet" href="/css/query-ui-1.10.3.custom.css" />
+  <link rel="stylesheet" type="text/css" media="screen" href="/css/ui.jqgrid.css" />
+  <link rel="stylesheet" type="text/css" media="screen" href="/css/ui.multiselect.css" />
+
+  <script src="js_library/jquery-2.0.1.js" type="text/javascript"></script>
+  <script src="js_library/jquery-ui-1.10.3.custom.js"></script>
+  <script src="js_library/jquery.layout.js" type="text/javascript"></script>
+  <script src="js_library/il8n/grid.locale-en.js" type="text/javascript"></script>
+  <script type="text/javascript">
+	$.jgrid.no_legacy_api = false;
+	$.jgrid.useJSON = true;
+  </script>
+  <script src="js_library/ui.multiselect.js" type="text/javascript"></script>
+  <script src="js_library/jquery.jqGrid.min.js" type="text/javascript"></script>
+  <script src="js_library/jquery.tablednd.js" type="text/javascript"></script>
+  <script src="js_library/jquery.contextmenu.js" type="text/javascript"></script>
+ 
+ <script src="/js/full_site_configuration.js" type="text/javascript"></script>
+</head>
+<body>
+
+<h1>Create Edit Delete Schedules </h1>
+
+<button type="button" id="back">Back</button>
+<button type="button" id="insert_schedule">Insert Schedule</button>
+<table id="grid_array"></table>
+  
+
+<div id="insert_schedule_form" title="Insert Schedule"> 
+  <form>
+  <fieldset>
+    <label for="copy_name" id ="copy_form_name" >New Schedule Name</label>
+    <input type="text" id="copy_name" />
+  </fieldset>
+  </form>
+</div>
+
+ </div> 
+   <div id="edit_schedule_data">
+   <h3 id="edit_schedule_data_name">Current Schedule is:</h3>
+</div>
+
+</body>

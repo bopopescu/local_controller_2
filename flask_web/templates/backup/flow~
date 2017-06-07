@@ -1,0 +1,47 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+	<title>Recent Flow Rate</title>
+        {% include 'header.html' %}
+        
+	<script type="text/javascript" src="/static/js_library/dygraph-combined.js"></script>
+  
+        <script type="text/javascript" src="/static/js/flow_sensor.js"></script>
+<body> 
+
+<div data-role="page"> 
+
+    <div id="header" data-role="header" data-theme="b">
+        <a id="bars-button" data-icon="bars" class="ui-btn-left" style="margin-top:10px;" href="#navpanel">Menu</a>
+        {% if file_name == flow %}
+            <h1>Recent Flow Rate GPM</h1>
+        {% endif %}
+        {% if file_name == coil %}
+            <h1>Recent Coil Current History </h1>
+        {% endif %}
+        {% if file_name == plc %}
+            <h1>Recent PLC Current History </h1>
+        {% endif %}
+
+    </div><!-- /header -->
+
+    
+
+     
+
+
+ 
+    <div id="select">
+    <button type="button" id="refresh">Refresh</button>
+    <h4 id="flow_schedule_label">Select Flow Meter</h4> 
+    <select id="flow_meter">
+    </select>
+    </div>
+       
+    <div id="div_g" "></div>
+     {% include 'menu.html' %}
+ 
+
+</div><!-- /page -->
+</html>

@@ -1,0 +1,26 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+	<link rel="shortcut icon" href="/static/favicon.ico">
+        {% include 'include_files.html' %}
+        
+<body>        
+<div data-role="page"> 
+    
+    {% include 'header.html' %}
+    {% include 'menu.html' %}
+
+    
+       <h3>List of Units </h3>
+       <ol>
+       {% for item in units -%}
+          <li>Unit: {{item.description}}  ------------------------ data:{{ item.data}}</li>
+       {%- endfor %}  
+
+      </ol>
+   
+
+</div><!-- /page -->
+</body>
+</html>

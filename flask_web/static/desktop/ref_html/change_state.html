@@ -1,0 +1,174 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+	<title>Manage Operation</title>
+	<link rel="stylesheet"  href="/css/jquery.mobile-1.3.1.min.css" />
+        <script type="text/javascript" src="/js_library/jquery-2.0.1.js"></script>
+	<script type="text/javascript" src="/js_library/jquery.mobile-1.3.1.js"></script>
+	<script type="text/javascript" src="/js/eto_handler.js"></script>
+	<script type="text/javascript" src="/js/edit_work_queue.js"></script>
+	<script type="text/javascript" src="/js/rain_flag.js"></script>
+	<script type="text/javascript" src="/js/eto_flag.js"></script>
+	<script type="text/javascript" src="/js/controller_pin_control.js"></script>
+	<script type="text/javascript" src="/js/system_state_a.js"></script>
+	<script type="text/javascript" src="/js/change_state.js"></script>
+	
+</head> 
+<body> 
+
+<div data-role="page"> 
+
+    <div data-role="header">
+	<h1>Manage Operations Operation</h1>
+    </div><!-- /header -->
+       <div data-role="navbar">
+       
+       <ul>
+		<li><a href="/index.html" target="_self"><h4>Home Page</h4> </a></li>
+
+	</ul>
+	
+  </div>
+    
+    <div data-role="collapsible-set" data-theme="c" data-content-theme="d" data-inset="true">
+     <div data-role="collapsible">
+       <h3> Current Operating Parameters:</h3>
+        <button type="button" id="refresh_a">Refresh</button>
+       <br><br>
+       <ul data-role="listview">
+          <li id="time_stamp">Time Stamp: </li>
+          <li id="controller_time_stamp">Controller Time Stamp: </li>
+          <li id="op_mode_a">Operating Mode: </li>
+          <li id="schedule">Sprinkler Schedule: </li>
+          <li id="step">Sprinkler Step:   </li>
+          <li id="time">Time Of Step:      </li>
+          <li id="duration">Current Duration:  </li>  
+          <li id="flow_rate">Current Flow Rate:  </li>
+          <li id="plc_current">PLC Current:  </li>
+          <li id="coil_current">Coil Current: </li>
+          <li id="rain_day">Rain Day:      </li>
+          <li id="eto_yesterday">ETO Yesterday: </li>
+          <li id="eto_current">ETO Current: </li>
+          <li id="eto_management">ETO Management: </li>
+          <li id="master_valve">Master Valve State: </li>
+        </ul>
+    
+     </div>
+    <div data-role="collapsible">
+       <h3> View Recent Profiles:</h3>
+        <ul data-role="listview">
+            
+
+            <li><a href="irrigation_queue.html"   target="_blank">Irrigation Queue </a></li>
+            <li><a href="recent_flow_history.html" target="_blank">Recent Flow History  </a></li>
+            <li><a href="recent_coil_history.html" target="_blank">Recent Coil History  </a></li>
+            <li><a href="recent_plc_history.html"  target="_blank">Recent PLC History   </a></li>
+
+        </ul>
+    
+     </div>
+    <div data-role="collapsible">
+        <h3>Manually Controller Irrigation Schedule</h3>     
+        <h4>Select Operating Mode</h4> 
+	<select id="op_mode">
+	    <option value=1>Offline</option>
+	    <option value=2>Queue Schedule</option>
+	    <option value=3>Queue Schedule Step</option>
+	    <option value=4>Queue Schedule Step Time</option>
+	    <option value=5>Clean Filter</option> 
+	    <option value=6>Open Master Valve</option>
+	    <option value=7>Close Master Valve</option> 
+            <option value=8>Restart Program</option>
+            <option value=9>Reset System</option>
+	</select>
+	  
+	<div id = "schedule_div">
+        <h4 id="schedule_label">Select Schedule</h4> 
+	<select id="manual_schedule">
+	</select>
+        </div>
+        <div id ="manual_div">
+        <h4 id="step_label">Select step</h4> 
+	<select id="manual_step">
+	</select>
+	</div>
+       <div id = "run_div"> 
+       <h4 id ="run_label">Select Run Time (1 to 60 Minutes) </h4> 
+       <select id="run_time">
+        </select>
+        </div>
+        <h4><br><br>Click to Change Schedule Modifier</h4>
+         <button type="button" id="change_mode">Click to Change Mode Mode</button>  
+    </div>
+    
+    
+    <div data-role="collapsible">
+       <h3>Manually Control Individual Valves</h3>
+       <h4 id="schedule_controller">Select Controller</h4> 
+	<select id="controller_select">
+	</select>
+        <h4 id="step_pin">Select Valve</h4> 
+	<select id="select_pin">
+	</select>
+	<h3 id ="controller_run_time_label">Select Run Time (1 to 60 Minutes) </h3> 
+        <select id="controller_run_time">
+        </select>
+
+        <h3>Click to Activate Controller Pin</h3>
+        <button type="button" id="controller_pin_turn_on">Click to Turn On</button>
+        <h4>Click to Turn Off Controller Pin</h4>
+        <button type="button" id="controller_pin_turn_off">Turn Off Pin</button>
+ 
+    </div>
+    <div data-role="collapsible">
+        <h3>Control Rain Day</h3>
+       <h3><br>Current Rain Day Setting: </h3> 
+	<select id="rain_flag">
+	    <option selected value=0>Off</option>
+	    <option value=1>On</option>
+	</select>
+       <h3><br><br>Click To Change Manage ETO</button>
+        <button type="button" id="change_rain_flag">Click to Change Rain Flag </button>
+ 
+    </div>
+
+    <div data-role="collapsible">
+        <h3>Control ETO Management</h3>
+        <h3><br><br>ETO Management Setting </h3>       
+	   <select id="eto_flag"> 
+               <option value=0>Off</option>
+	       <option selected value=1>On</option>
+	   </select>
+        <h3><br><br>Click To Change Manage ETO</button>
+        <button type="button" id="change_eto_flag">Click to Change ETO Management </button>
+     </div>
+    </div>
+    <div data-role="collapsible">
+       <h3>Edit ETO Data</h3>
+        <button type="button" id="refresh_c">Reload Data</button>
+       <h3>Select Action For Checked Enities</h3> 
+       <select id="eto_op_mode">
+            <option selected value=0>No Action</option>
+	    <option value=1>Zero Selected ETO Data</option>
+	    <option value=2>Subtract .05 inch from ETO Data</option>
+	    <option value=3>Add .05 inch from ETO Data</option>
+	    <option value=4>Select All Elements</option>
+	    <option value=5>Unselect All Elememts</option>
+	    <option value=6>Reset ETO Data</option>
+	    <option value=7>Save ETO Data</option>    
+       </select>
+       <div id="eto_list">
+       </div>
+    </div>
+    <div data-role="collapsible">
+         <button type="button" id="refresh_b">Refresh</button>
+        <h3>Edit Irrigation Queue</h3>
+        <button type="button" id="delete_limits">Delete Selected Elements</button> 
+        <div id="queue_elements">
+        </div>
+    </div>
+ 
+</div>
+</div><!-- /page -->
+</html>

@@ -1,0 +1,79 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+	<title>Web Monitoring Program</title>
+	<link rel="stylesheet"  href="/css/jquery.mobile-1.0a4.1.min.css" />
+
+	<script type="text/javascript" src="/js/jquery-2.0.1.js"></script>
+	<script type="text/javascript" src="/js/jquery.mobile-1.3.1.js"></script>
+	<script type="text/javascript" src="/js/manual_rain_day.js"></script>
+</head> 
+<body> 
+
+  <section id = "manage_rain_day" data-role="page">
+    <header data-role = "header" >
+      
+       <div data-role="navbar">
+	<ul>
+		<li><a href="index.html" target="_self">Operations</a></li>
+		<li><a href="configure_mode.html" target="_self" >Config</a></li>
+		<li><a href="admin.html"  target="_self">Sys Admin</a></li>
+	</ul>
+      </div>
+      <div data-role="navbar">
+	<ul>
+
+		<li><a href="index.html" target="_self">System State</a></li>
+		<li><a href="alarms.html" target="_self">Alarm Page</a></li>
+	        <li><a href="manual_set_mode.html" target="_self" > Manual Operations</a></li>
+		<li><a href="statistics.html" target="_self" >Statistics</a></li>
+
+	</ul>
+     </div>     
+     <div data-role="navbar">
+	<ul>
+		<li><a href="manual_set_mode.html" target="_self" > Change Operating Mode</a></li>
+		<li><a href="manual_mode_raw.html" target="_self">Controller Pin Schedule </a></li>
+		<li><a href="manual_rain_day.html" target="_self">Rain Day / Derating Factor</a></li>
+                <li><a href="manual_flow_limit.html" target="self">Manage Flow Limit</a></li>
+                <li><a href="manual_current_limit.html" target="self">Manage Current Limits</a></li>
+		
+		
+	</ul>
+     </div>
+    </header>
+    <center>
+    <h1>Operations / Manual Mode / Change Rain Day</h1>
+    </center>
+    <div data-role="content" class="content" >
+
+       <h3><br>Current Rain Day Setting: </h3> 
+	<select id="rain_flag">
+	    <option selected value=0>Off</option>
+	    <option value=1>On</option>
+	</select>
+
+       <button type="button" id="change_rain_flag">Click to Change Rain Flag </button>
+       
+        <h3><br><br>Current ETO Management Setting </h3>    
+  
+        
+	<select id="eto_flag">
+            <option value=0>Off</option>
+	    <option selected value=1>On</option>
+
+	</select>
+        <h3><br><br>Click To Change Manage ETO</button>
+        <button type="button" id="change_eto_flag">Click to Change ETO Management </button>
+     </div>    
+  </section>
+
+
+
+
+ 
+  
+ 
+</body>
+</html>

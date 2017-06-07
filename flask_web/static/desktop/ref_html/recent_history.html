@@ -1,0 +1,40 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+	<title>Change Operation</title>
+	<link rel="stylesheet"  href="/css/jquery.mobile-1.3.1.min.css" />
+        <script type="text/javascript" src="/js_library/jquery-2.0.1.js"></script>
+	<script type="text/javascript" src="/js_library/jquery.mobile-1.3.1.js"></script>
+	<script type="text/javascript" src="js_library/jqBarGraph.1.1.js"></script>
+	<script type="text/javascript" src="js_library/dygraph-combined.js"></script>
+        <script type="text/javascript" src="/js/flow_sensor.js"></script>
+
+</head> 
+<body> 
+
+<div data-role="page"> 
+
+    <div data-role="header">
+	<h1>Recent History</h1>
+    </div><!-- /header -->
+    <a id ="back" href='/index.html' target="_self">Back</a>
+ 
+    <h3>Recent Flow Rate</h3> 
+    <h4 id="flow_schedule_label">Select Flow Meter</h4> 
+    <select id="flow_meter">
+    </select>
+    <div id data-role="content" class="content" >
+                   <h4> Graph of Previous Flow History  </h3>
+                   <div id="div_g" style="width:500px; height:400px;"></div>
+ 
+     </div>
+       
+    
+    
+    
+    
+
+</div><!-- /page -->
+</html>
+

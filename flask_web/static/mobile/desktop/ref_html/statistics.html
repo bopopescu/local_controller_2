@@ -1,0 +1,98 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+	<title>Web Monitoring Program</title>
+	<link rel="stylesheet"  href="/css/jquery.mobile-1.0a4.1.min.css" />
+
+	<script type="text/javascript" src="/js/jquery-2.0.1.js"></script>
+	<script type="text/javascript" src="/js/jquery.mobile-1.3.1.js"></script>
+        <script type="text/javascript" src="/js/dygraph-combined.js"></script>
+        <script type="text/javascript" src="/js/graph_a.js"></script>
+
+</head> 
+<body> 
+  <section id = "graph_flow_history" data-role="page">
+    <header data-role = "header" >
+      
+      <div data-role="navbar">
+	<ul>
+		<li><a href="index.html"  target="_self" >Current Conditions</a></li>
+		<li><a href="configure_mode.html" target="_self" >Config</a></li>
+		<li><a href="admin.html"  target="_self">Sys Admin</a></li>
+	</ul>
+     </div>
+     <div data-role="navbar">
+	<ul>
+
+		<li><a href="index.html#StatusPage" target="_self">System State</a></li>
+		<li><a href="index.html#AlarmPage" target="_self">Alarm Page</a></li>
+	       <li><a href="manual_set_mode.html" target="_self" > Manual Operations</a></li>
+		<li><a href="overall_statistics.html" target="_self" >Statistics</a></li>
+		
+	</ul>
+     </div>
+     <div data-role="navbar">
+	<ul>
+	        <li><a href="overall_statistics.html" target="_self">Overall Statistics</a></li>
+		<li><a href="statistics.html" target="_self">Average Flow Rate History</a></li>
+		<li><a href="cumulative_flow.html" target="_self">Total Flow History </a></li>
+		<li><a href="current_history.html" target="_self">Average Current History</a></li>
+		
+		
+	</ul>
+     </div>
+     <div data-role="navbar">
+	<ul>
+		<li><a href="statistics.html" target="_self">Flow_History</a></li>
+		<li><a href="average_flow.html" target="_self">Average Flow History</a></li>
+		<li><a href="variance_flow.html" target="_self">Variance Flow History</a></li>
+		
+	</ul>
+     </div>
+
+
+    </header>
+    <div data-role="content" class="content" >
+       <center>
+       <h1>Operation Mode / Statistics / Average Flow History / Flow Rate History </h1>
+       </center>
+        <h3>Select Flow Sensor</h3> 
+	<select id="Flow_Flow_Sensor">
+	</select>
+        <h3>Select Schedule</h3> 
+	<select id="Flow_Schedule">
+	</select>
+        <h3>Select Step</h3> 
+	<select id="Flow_Step">
+	</select>
+         <h3>Select Relative Day</h3> 
+	<select id="Flow_Relative_Day">
+	    <option selected value=1>1</option>
+	    <option value=2>2</option>
+	    <option value=3>3</option>
+	    <option value=4>4</option>
+	    <option value=5>5</option>  
+	    <option value=6>6</option>
+	    <option value=7>7</option>
+	    <option value=8>8</option>
+	    <option value=9>9</option>    
+            <option value=10>10</option>    
+
+	</select>
+        <br>
+        <button type="button" id="graph_flow">Graph Flow Data</button>
+        <br><h3>Graph of Flow Rate</h3>
+        <div id="div_g_flow" style="width:600px; height:400px;"></div>
+    </div>
+
+  </section>
+
+
+
+ 
+
+
+</body>
+</html>
+
