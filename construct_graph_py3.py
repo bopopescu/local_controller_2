@@ -397,5 +397,6 @@ if __name__ == "__main__" :
    cf.end_site()
    cf.end_system()
    cf.check_namespace()
+   cf.store_keys()
 
 

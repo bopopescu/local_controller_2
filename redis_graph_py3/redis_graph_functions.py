@@ -120,26 +120,30 @@ class Build_Configuration(Basic):
 class Query_Configuration(Basic):
 
    def __init__( self, redis_handle):
+      
+        self.redis_handle = redis_handle
         super().__init__(redis_handle)   
 
    def match_terminal_relationship( self, relationship, label= None , starting_set = None,property_values = None, data_flag = True ):
        return_value = None
+       #print("initial starting set",starting_set)
        if starting_set == None:
-          starting_set = redis_handle.smembers("@GRAPH_KEYS")
+          starting_set = self.redis_handle.smembers("@GRAPH_KEYS")
        #print("starting set",starting_set)#
        if label == None:
           #print("made it here")
-          if redis_handle.sismember( "@TERMINALS", relationship) == True:
+          if self.redis_handle.sismember( "@TERMINALS", relationship) == True:
               #print("made it here #2") 
-              return_value = set(redis_handle.smembers("&"+relationship))
+              return_value = set(self.redis_handle.smembers("&"+relationship))
               #print("return_value 1",return_value)
               #print( starting_set)
               return_value = return_value.intersection(starting_set)
+              #print("return_value",return_value)
        
        else:
-          if redis_handle.sismember( "@TERMINALS", relationship) == True:
-               if redis_handle.exists("$"+relationship+self.rel_sep+label) == True:
-                   return_value = redis_handle.smembers("$"+relationship+self.rel_sep+label)
+          if self.redis_handle.sismember( "@TERMINALS", relationship) == True:
+               if self.redis_handle.exists("$"+relationship+self.rel_sep+label) == True:
+                   return_value = self.redis_handle.smembers("$"+relationship+self.rel_sep+label)
                    return_value = return_value.intersection(starting_set)
 
        if (property_values != None) and (return_value != None):
@@ -153,21 +157,21 @@ class Query_Configuration(Basic):
    def match_relationship( self, relationship, label= None , starting_set = None ):
        return_value = None
        if starting_set == None:
-          starting_set = redis_handle.smembers("@GRAPH_KEYS")
+          starting_set = self.redis_handle.smembers("@GRAPH_KEYS")
        #print("starting set",starting_set)#
        if label == None:
           #print("made it here")
-          if redis_handle.sismember( "@RELATIONSHIPS", relationship) == True:
+          if self.redis_handle.sismember( "@RELATIONSHIPS", relationship) == True:
               #print("made it here #2") 
-              return_value = set(redis_handle.smembers("%"+relationship))
+              return_value = set(self.redis_handle.smembers("%"+relationship))
               #print("return_value 1",return_value)
               #print( starting_set)
               return_value = return_value.intersection(starting_set)
        
        else:
-          if redis_handle.sismember( "@RELATIONSHIPS", relationship) == True:
-               if redis_handle.exists("#"+relationship+self.rel_sep+label) == True:
-                   return_value = redis_handle.smembers("#"+relationship+self.rel_sep+label)
+          if self.redis_handle.sismember( "@RELATIONSHIPS", relationship) == True:
+               if self.redis_handle.exists("#"+relationship+self.rel_sep+label) == True:
+                   return_value = self.smembers("#"+relationship+self.rel_sep+label)
                    return_value = return_value.intersection(starting_set)
    
        return return_value
@@ -177,7 +181,7 @@ class Query_Configuration(Basic):
        for i in list(starting_set):
            flag = True
            for j , value in property_values.items(): 
-               data = redis_handle.hget(i,j).decode("utf-8")
+               data = self.redis_handle.hget(i,j).decode("utf-8")
                if data == None:
                    flag = False
                    break
@@ -229,6 +233,15 @@ class Query_Configuration(Basic):
        for i in list_set:
            return_value[i[dict_property]] = i
        return return_value
+
+   def form_key_list( self,key, property_array ):
+       return_value = []
+       for i in property_array:
+          return_value.append(i[key])
+       return return_value   
+
+
+
       
 if __name__ == "__main__":
    redis_handle  = redis.StrictRedis( host = "127.0.0.1", port=6379, db = 11 )   

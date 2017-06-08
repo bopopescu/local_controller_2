@@ -1,7 +1,8 @@
 import json
-
+import redis
 
 from redis_graph_py3.redis_graph_functions import Build_Configuration
+from redis_graph_py3.redis_graph_functions import Query_Configuration
 
 
 
@@ -247,12 +248,11 @@ class Construct_Farm(Build_Configuration):
        self.construct_node(  push_namespace=False,relationship="PROCESS_MONITOR", label=name, properties = properties)
 
    
-class Graph_Management():
+class Graph_Management(Query_Configuration):
 
    def __init__( self , controller_name, io_server_name, data_store_name ):
       self.redis_handle  = redis.StrictRedis( host = "localhost", port=6379, db = 15 )   
-
-      self.qc = Query_Configuration( self.redis_handle )
+      super().__init__( self.redis_handle)
       
       self.controller_name = controller_name
       self.io_server_name  = io_server_name
@@ -261,28 +261,20 @@ class Graph_Management():
 
 
    def find_remotes( self  ):
-      data = self.qc.match_terminal_relationship( "REMOTE_UNIT", label= None , starting_set = None )
+      data = self.match_terminal_relationship( "REMOTE_UNIT", label= None , starting_set = None )
  
       return data
 
 
 
-   def find_remotes_by_function( self,  function ):
-       keys = self.match_relationship("REMOTE_UNIT")
-       return_value = []
-       for i in keys:
-           if function in set(i["function"]) :
-              return_value.append(i)
-       
-       return return_value
-
    def find_data_stores( self ):
-       data = self.match_relationship("DATA_STORE")
-       data = self.qc.match_relationship( "DATA_STORE", label= None , starting_set = None )
+
+       data = self.match_terminal_relationship( "DATA_STORE", label= None , starting_set = None )
+
        return data
 
    def find_io_servers( self ):
-      data = self.qc.match_relationship( "UDP_IO_SERVER", label= None , starting_set = None )
+      data = self.match_terminal_relationship( "UDP_IO_SERVER", label= None , starting_set = None )
       return data
 
    

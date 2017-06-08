@@ -1,3 +1,6 @@
+import datetime
+import time
+
 class Opcodes():
 
     def __init__(self):
@@ -253,7 +256,7 @@ class Opcodes():
 
     def log(self, cf_handle, chainObj, parameters, event):
         if event["name"] == "INIT":
-            print( "Log ---", parameters[0] )
+            print("Log ---", parameters[0])
         return "DISABLE"
 
     def enable_chain(self, cf_handle, chainObj, parameters, event):
@@ -295,8 +298,6 @@ class Opcodes():
             cf_handle.changeState(chain_state, chain)
 
         return "DISABLE"
-
-
 
 
 class CF_Base_Interpreter():
@@ -495,7 +496,7 @@ class CF_Base_Interpreter():
             else:
                 j["active"] = False
 
-    def execute(self):
+    def execute_queue(self):
         while True:
             if len(self.event_queue) > 0:
                 event = self.event_queue.pop()
@@ -615,13 +616,13 @@ class CF_Base_Interpreter():
 
         return return_value
 
-  def execute(self):
+    def execute(self):
      time_stamp = datetime.datetime.today()
      old_day = time_stamp.day
      old_hour = time_stamp.hour
      old_minute = time_stamp.minute
      old_second = time_stamp.second
-     self.cf.execute_initialize()
+     self.execute_initialize()
      while True:
        time.sleep(.1)
        # self.cf.queue_event("SUB_SECOND_TICK",10)
@@ -631,20 +632,20 @@ class CF_Base_Interpreter():
        second = time_stamp.second
        day = time_stamp.day
        if old_second != second:
-         self.cf.queue_event("TIME_TICK", second)
+         self.queue_event("TIME_TICK", second)
        if old_minute != minute:
-         self.cf.queue_event("MINUTE_TICK", minute)
+         self.queue_event("MINUTE_TICK", minute)
        if old_hour != hour:
-         self.cf.queue_event("HOUR_TICK", minute)
+         self.queue_event("HOUR_TICK", minute)
        if old_day != day:
-         self.cf.queue_event("DAY_TICK", day)
+         self.queue_event("DAY_TICK", day)
 
        old_hour = hour
        old_minute = minute
        old_second = second
        old_day = day
        try:
-          self.cf.execute()
+          self.execute_queue()
        except:
           print( "chain flow exception")
           print( "current chain is ", self.cf.current_chain["name"] )
