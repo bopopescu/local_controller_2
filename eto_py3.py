@@ -121,7 +121,7 @@ class Eto_Management(object):
         if event["name"] == "INIT":
             return "CONTINUE"
 
-        print( "make measurements", self.eto_sources)
+        #print( "make measurements", self.eto_sources)
         return_value = "DISABLE"
         self.start_sensor_integration()
         for i in self.eto_sources:
@@ -131,17 +131,18 @@ class Eto_Management(object):
             data_value = self.redis_handle.lindex(data_store, 0)
             flag, data = self.eto_calculators.eto_calc(i)
             if flag:
-                temp = json.dumps(data)
-                self.redis_handle.lset(data_store, 0, temp)
+                temp = data
+                #self.redis_handle.lset(data_store, 0, temp)
                 self.update_integrated_eto_value(i, temp)
 
         for i in self.rain_sources:
             data_store = i["measurement"]
             data_value = self.redis_handle.lindex(data_store, 0)
             flag, data = self.eto_calculators.rain_calc(i)
+            
             if flag:
-                temp = json.dumps(data)
-                self.redis_handle.lset(data_store, 0, temp)
+                temp = data
+                #self.redis_handle.lset(data_store, 0, temp)
                 self.update_rain_value(i, temp)
 
         self.store_integrated_data()
@@ -212,7 +213,8 @@ class Eto_Management(object):
         self.rain_sensors = {}
 
     def update_integrated_eto_value(self, eto_source, data_value):
-        # print "update
+ 
+        
         # eto_value",eto_source["name"],eto_source["majority_vote_flag"],data_value
         self.eto_sensors[eto_source["name"]] = data_value
         if eto_source["majority_vote_flag"]:
@@ -224,11 +226,9 @@ class Eto_Management(object):
     def store_integrated_data(self):
         #print "integrating data"
         #print json.dumps(self.mv_eto_sensors)
-
+        print( self.rain_sensors, self.eto_sensors) 
         self.redis_handle.set(
-            self.eto_integrated_measurement,
-            json.dumps(
-                self.mv_eto_sensors))
+            self.eto_integrated_measurement,json.dumps(self.mv_eto_sensors))
         self.redis_handle.set(
             self.eto_measurement, json.dumps(
                 self.eto_sensors))
@@ -242,6 +242,7 @@ class Eto_Management(object):
         if key_length > 0:
             return_value = 0
             for key, value in self.mv_eto_sensors.items():
+                
                 if return_value < value:
                     return_value = value
         else:
@@ -266,7 +267,7 @@ class Eto_Management(object):
         return return_value
 
     def get_max_data(self, json_data):
-
+        print("json_data",json_data)
         data = json.loads(json_data)
         #print "get_max_data", data
         key_length = len(data.keys())
@@ -285,10 +286,10 @@ class Eto_Management(object):
         data["namespace"] = self.cloud_namespace
         data["eto"] = self.get_max_data(
             self.redis_handle.get(
-                self.eto_integrated_measurement))
+                self.eto_integrated_measurement).decode("utf-8"))
         data["rain"] = self.get_max_data(
             self.redis_handle.get(
-                self.rain_measurement))
+                self.rain_measurement).decode("utf-8"))
         data["time_stamp"] = time.strftime(
             "%b %d %Y %H:%M:%S", time.localtime(
                 time.time() - 24 * 3600))  # time stamp is a day earlier
@@ -391,6 +392,7 @@ class ETO_Calculators(object):
         messo_eto = Messo_ETO(eto_data)
         messo_results = messo_eto.get_daily_data(time=time.time())
         result = self.calculate_eto(eto_data["altitude"], messo_results)
+        
         return result
 
     def hybrid_eto(self, eto_data):
@@ -518,7 +520,7 @@ class CIMIS_ETO(object):
         req = urllib.request.Request(url)
         response = urllib.request.urlopen(req)
         temp = response.read().decode("utf-8") 
-
+        #print("temp",temp)
         data = json.loads(temp)
         #print("data",data)
         return {

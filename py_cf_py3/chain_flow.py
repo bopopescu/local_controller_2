@@ -648,8 +648,8 @@ class CF_Base_Interpreter():
           self.execute_queue()
        except:
           print( "chain flow exception")
-          print( "current chain is ", self.cf.current_chain["name"] )
-          print( "current link  is ", self.cf.current_link)
+          print( "current chain is ", self.current_chain["name"] )
+          print( "current link  is ", self.current_link)
           raise
 
 # test code
