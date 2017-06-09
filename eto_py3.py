@@ -238,17 +238,19 @@ class Eto_Management(object):
 
     def get_eto_integration_data(self):
         #print "get_eto_integration_data"
-        key_length = len(self.mv_eto_sensors.keys())
-        if key_length > 0:
-            return_value = 0
-            for key, value in self.mv_eto_sensors.items():
-                
-                if return_value < value:
-                    return_value = value
-        else:
-            return_value = self.eto_default
-            # send alert error message
-        #print "eto_integration", return_value
+        try:
+           key_length = len(self.mv_eto_sensors.keys())
+           if key_length > 0:
+               return_value = 0
+               for key, value in self.mv_eto_sensors.items():
+                  if return_value < value:
+                       return_value = value
+           else:
+              return_value = self.eto_default
+              # send alert error message
+        except:
+           return_value = self.eto_default
+        #print ("eto_integration", return_value)
         return return_value
 
     def integrated_eto_flag(self):
@@ -702,7 +704,7 @@ def construct_eto_instance(gm, redis_handle):
 def add_eto_chains(eto, cf):
     cf.define_chain("eto_time_window", True)
     cf.insert_link("link_1", "WaitEvent", ["DAY_TICK"])
-    cf.insert_link(" xxx", "Log", ["Got Day Tick"])
+    cf.insert_link("xxx", "Log", ["Got Day Tick"])
     cf.insert_link("link_2", "One_Step", [eto.generate_new_sources])
     cf.insert_link("link_3", "Reset", [])
 
