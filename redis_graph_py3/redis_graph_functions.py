@@ -5,21 +5,22 @@ import redis
 import copy
 import json
 
-class Basic(object):
-   def __init__( self, redis_handle):
+
+def basic_init(self):
       self.sep       = "["
       self.rel_sep   = ":"
       self.label_sep = "]"
       self.namespace     = []
-      self.redis_handle  = redis_handle
+  
 
 
 
-class Build_Configuration(Basic):
+class Build_Configuration(object):
    def __init__( self, redis_handle):  
-      super().__init__(redis_handle)   
-      self.delete_all()
-      self.keys = set()
+       self.redis_handle = redis_handle
+       self.delete_all()
+       self.keys = set()
+       basic_init(self)
  
    def build_namespace( self,name ):
        return_value = copy.deepcopy(self.namespace) 
@@ -117,12 +118,12 @@ class Build_Configuration(Basic):
    def delete_all(self): #tested
        self.redis_handle.flushdb()
 
-class Query_Configuration(Basic):
+class Query_Configuration(object):
 
    def __init__( self, redis_handle):
       
         self.redis_handle = redis_handle
-        super().__init__(redis_handle)   
+        basic_init(self)  
 
    def match_terminal_relationship( self, relationship, label= None , starting_set = None,property_values = None, data_flag = True ):
        return_value = None
@@ -171,7 +172,7 @@ class Query_Configuration(Basic):
        else:
           if self.redis_handle.sismember( "@RELATIONSHIPS", relationship) == True:
                if self.redis_handle.exists("#"+relationship+self.rel_sep+label) == True:
-                   return_value = self.smembers("#"+relationship+self.rel_sep+label)
+                   return_value = self.redis_handle.smembers("#"+relationship+self.rel_sep+label)
                    return_value = return_value.intersection(starting_set)
    
        return return_value
