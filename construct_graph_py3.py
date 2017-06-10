@@ -10,8 +10,8 @@ import redis
 import farm_template_py3
 
 if __name__ == "__main__" :
-   redis_handle  = redis.StrictRedis( host = "localhost", port=6379, db = 15 )   
-   cf = farm_template_py3.Construct_Farm(redis_handle)
+   
+   cf = farm_template_py3.Construct_Farm()
    
    #
    #

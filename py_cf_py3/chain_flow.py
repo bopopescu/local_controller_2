@@ -35,14 +35,6 @@ class Opcodes():
         self.opcodes["Resume_Chain"] = self.resume_chain_code
         self.opcodes["Code_Step"] = self.code_step_code
 
-        self.all_event_flag = {}
-        for i in self.opcodes.keys():
-           self.all_event_flag[i] = False
-        self.all_event_flag["Code"] = True
-        self.all_event_flag["Code_Step"] = True
-        self.all_event_flag["Wait"] = True
-        self.all_event_flag["Wait_Reset"] = True
-        self.all_event_flag["Verify"] = True 
 
         self.register_events = {}
         for i in self.opcodes.keys():
@@ -56,6 +48,17 @@ class Opcodes():
         self.special_handling["WaitEvent"]  = self.wait_event_processing
         self.special_handling["WaitEventCount"] = self.wait_event_processing
         self.special_handling["WaitEvent_Reset"] = self.wait_event_processing
+
+        self.all_event_flag = {}
+        for i in self.opcodes.keys():
+           if len( self.register_events[i] ) > 0:
+               self.all_event_flag[i] = False
+               continue
+           if i in self.special_handling:
+                self.all_event_flag[i] = False
+                continue
+           self.all_event_flag[i] = True
+        #print( self.all_event_flag)
 
     def wait_event_processing( self, parameters ):
         #print("wait event processing", parameters[0] )
@@ -461,7 +464,9 @@ class CF_Base_Interpreter():
 
     def find_link_object(self, chain, link):
         links = chain["links"]
+        print("links",links)
         for i in links:
+            print("i_name",i["name"])
             if link == i["name"]:
                 return i
         return None
@@ -486,21 +491,6 @@ class CF_Base_Interpreter():
             k = self.find_link_object(chain, j)
             k["init_flag"] = True
             k["active_flag"] = True
-
-    def disable_link(self, link, *ref_chain):
- 
-        link = self.link_to_list(link)
-
-        if len(ref_chain) == 0:
-            chain = self.current_chain
-        else:
-            chain = self.find_chain_object(ref_chain[0])
-
-        #print("link",link)
-        for j in link:
-            k = self.find_link_object(chain, j)
-            k["init_flag"] = True
-            k["active_flag"] = False
 
     # change state to new link
     def change_state(self, active_link, *refChain):
@@ -555,15 +545,19 @@ class CF_Base_Interpreter():
        if name == "__CHAIN_FLOW_START__":
            self.execute_event_a(event)
            return
+       if name not in self.event_list:
+           self.event_list[name] = []
+
+       all_event_set = self.all_event_list
+       event_set     = self.event_list[name]
        for chain in self.chains:
+           chain_name = chain["name"]
            if chain["active"] == False:
                continue
-           if chain in self.all_event_list:
+           if chain_name in all_event_set:
                self.execute_chain( chain, event )
                continue
-           if name not in self.event_list:
-               self.event_list[name] = []
-           if chain in self.event_list[name]:
+           if chain_name in event_set:
                self.execute_chain( chain, event )
            
            
@@ -650,7 +644,7 @@ class CF_Base_Interpreter():
             return_value = False
 
         if returnCode == "BREAK":
-            self.disable_link(link["name"])
+            self.disable_link(link)
             #remove Events
             return_value = False
 
@@ -665,7 +659,7 @@ class CF_Base_Interpreter():
         if returnCode == "DISABLE":
             self.remove_events( chain)
             #print( "made it here", link )
-            self.disable_link(link["name"])
+            self.disable_link(link)
             chain["link_index"] = chain["link_index"] + 1
             return_value = True
             # print "chain",chain["link_index"]
@@ -683,55 +677,76 @@ class CF_Base_Interpreter():
 
         return return_value
 
+    def disable_link(self, link, ):
+ 
+        link["init_flag"] = True
+        link["active_flag"] = False
+
+
 
     def remove_events( self, chain_obj):
        self.deregister_event( chain_obj )
        self.deregister_all_events( chain_obj )
 
     def register_events( self,chain_obj, link_obj):
-       
+       name = chain_obj["name"]
        for i in link_obj["register_events"]:           
            if i not in self.event_list:
                self.event_list[i] = []
-           self.event_list[i].append(chain_obj)
+           self.event_list[i].append(name)
 
 
     def deregister_event( self, chain_obj):
+       name = chain_obj["name"]
+ 
        current_index = chain_obj["link_index"]
        current_link = chain_obj["links"][current_index]
-       
+
+      
        for i in current_link["register_events"]:
            if i not in self.event_list:
                self.event_list[i] = []
-           self.event_list[i].remove(chain_obj)
+           self.event_list[i].remove(name)
        
     def register_all_events( self, chain_obj, link_obj):
+
+       name = chain_obj["name"]
+
        if self.all_event_list == False:
            self.all_event_list = []
        if link_obj["all_events"] == True:
-           self.all_event_list.append(chain_obj)
+           self.all_event_list.append(name)
       
     def deregister_all_events( self, chain_obj):
+
+       name = chain_obj["name"]
+
        current_index = chain_obj["link_index"]
        current_link = chain_obj["links"][current_index]
 
        if self.all_event_list == False:
            self.all_event_list = []
        if current_link["all_events"] == True:
-           self.all_event_list.remove(chain_obj)
+           self.all_event_list.remove(name)
 
     def clear_all_all_events( self, chain_obj ):
+
+       name = chain_obj["name"]
+
        try:
            while True:
-               self.all_event_list.remove( chain_obj)
+               self.all_event_list.remove( name )
        except:
            pass
 
     def clear_all_register_events( self,chain_obj ):
+
+       name = chain_obj["name"]
+
        for i in self.event_list:
            try:
                while True:
-                   self.event_list[i].remove( chain_obj )
+                   self.event_list[i].remove( name )
            except:
                pass
 

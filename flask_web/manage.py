@@ -6,10 +6,10 @@ import flask
 from flask import Flask
 from flask import render_template,jsonify,request
 
-from app.flow_rate_functions    import *
-from app.system_state           import *
-from app.statistics_modules     import *
-from app.template_support       import *
+#from app.flow_rate_functions    import *
+#from app.system_state           import *
+#from app.statistics_modules     import *
+#from app.template_support       import *
 import os
 import redis
 import json
@@ -27,21 +27,21 @@ startup_dict          = redis_startup.hgetall("web")
 
 app = Flask(__name__)
 
-from io_control.io_controller_class import Build_Controller_Classes
-from io_control.new_instrument import Modbus_Instrument
-client_driver = Modbus_Instrument()
-controller_classes = Build_Controller_Classes(client_driver)
+#from io_control.io_controller_class import Build_Controller_Classes
+#from io_control.new_instrument import Modbus_Instrument
+#client_driver = Modbus_Instrument()
+#controller_classes = Build_Controller_Classes(client_driver)
   
-udp_ping_client = controller_classes.get_controller_class( "192.168.1.84" )
+#udp_ping_client = controller_classes.get_controller_class( "192.168.1.84" )
 
 redis_handle    = redis.StrictRedis(redis_server_ip, redis_server_port  , redis_server_db)
 sys_files = load_files.SYS_FILES(redis_handle)
 app_files = load_files.APP_FILES(redis_handle)
 
-flow_rate_functions = FlowRateFunctions(redis_handle  )
-system_status          = System_Status( redis_handle )
-statistics_module      = Statistics_Module(redis_handle)
-template_support       = template_support(redis_handle,statistics_module)
+#flow_rate_functions = FlowRateFunctions(redis_handle  )
+#system_status          = System_Status( redis_handle )
+#statistics_module      = Statistics_Module(redis_handle)
+#template_support       = template_support(redis_handle,statistics_module)
 
 #  get handle to graphical data base
 #  
