@@ -72,24 +72,23 @@ if __name__ == "__main__":
    redis  = redis.StrictRedis( host = "127.0.0.1", port=6379, db = 11 )   
    common = Redis_Graph_Common( redis)
    redis_key, new_namespace =common.construct_node( [], "","head","head" )
-   print redis_key,new_namespace
-   print redis.hgetall(redis_key)
+   print (redis_key,new_namespace)
+   print (redis.hgetall(redis_key))
 
    redis_key, new_namespace =common.construct_node( new_namespace,"relation 1","level_one","h1" )
-   print redis_key,new_namespace
-   print redis.hgetall(redis_key)
+   print (redis_key,new_namespace)
+   print (redis.hgetall(redis_key))
    redis_key, new_namespace =common.construct_node(  new_namespace,"relation 2","level_two","h2" )
-   print redis_key,new_namespace
-   print redis.hgetall(redis_key)
+   print (redis_key,new_namespace)
+   print (redis.hgetall(redis_key))
 
-   print "simple match"
-   print common.match( "relation 2","level_two","h2")
-   print "starting match"
-   print common.match( "*","level_two","h2",[["","head","head"]])
-
-   print "all the keys"
-   print redis.keys("*")
-   print "none of the keys"
+   print ("simple match")
+   print (common.match( "relation 2","level_two","h2"))
+   print ("starting match")
+   print (common.match( "*","level_two","h2",[["","head","head"]]))
+   print ("all the keys")
+   print (redis.keys("*"))
+   print ("none of the keys")
    common.delete_all()
-   print redis.keys("*")
+   print (redis.keys("*"))
 

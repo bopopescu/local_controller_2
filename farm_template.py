@@ -1,11 +1,11 @@
 import json
 
-
+import redis_graph
 from redis_graph.redis_graph_populate import Build_Configuration
 from redis_graph.redis_graph_common import Redis_Graph_Common
-#import copy
+import copy
 
-class Construct_Farm(Build_Configuration):
+class Construct_Farm(redis_graph.redis_graph_populate.Build_Configuration):
 
    def __init__( self, redis_handle, redis_graph_common ):
      

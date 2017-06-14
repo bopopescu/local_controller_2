@@ -38,9 +38,9 @@ class Execute_Cf_Environment():
        try:
           self.cf.execute(  ) 
        except:
-          print "chain flow exception"
-          print "current chain is ",self.cf.current_chain["name"]
-          print "current link  is ",self.cf.current_link
+          print( "chain flow exception" )
+          print( "current chain is ",self.cf.current_chain["name"] )
+          print( "current link  is ",self.cf.current_link          )
           raise
 
 
@@ -151,7 +151,7 @@ if __name__ == "__main__":
 
     cf.execute_initialize()
     for i in range(0,10):
-       print i
+       print( i )
        cf.queue_event("TEST", [] )
        cf.execute(  )
     print("done")

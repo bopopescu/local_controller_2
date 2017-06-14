@@ -2,13 +2,13 @@
 import datetime
 import time
 import string
-import urllib2
+#import urllib2
 import math
 import redis
 import base64
 import json
 
-import py_cf
+import py_cf_3.cf_interpreter
 import os
 import copy
 
@@ -106,7 +106,7 @@ class Moisture_Control(object):
          temp = driver_class.check_status( modbus_address )
          time.sleep(1.0)
          driver_class.force_moisture_reading(modbus_address)
-         time.sleep(1.0)
+         time.sleep(1.5)
 
          temp =  driver_class.read_moisture_control( modbus_address )
          item["humidity"] = temp["AIR_HUMIDITY_FLOAT"]
@@ -123,7 +123,7 @@ class Moisture_Control(object):
 
        except:
           #raise
-          print "exception handler"
+          print ("exception handler")
           measure_properties["read_status"]  = "Communications problems with moisture plc at "+time_stamp
           measure_properties["measurement_status"]        =     0
        return measure_properties
@@ -149,7 +149,7 @@ class Moisture_Control(object):
 
    def hour_update( self,chainFlowHandle, chainOjb, parameters, event ):
 
-       print "hour tick"
+       #print "hour tick"
        for  i in self.moisture_app_classes:
            name = i["name"]
            redis_key = self.store_data_list[name]["queue_name"]
@@ -168,18 +168,18 @@ class Moisture_Control(object):
        for  i in self.moisture_app_classes:
            name = i["name"]
            hour_redis_key = self.store_air_list[name]["queue_name"]
-           print "hour_redis_key",hour_redis_key
-           print "hour_redis_key",self.redis_handle.llen(hour_redis_key)
+           #print "hour_redis_key",hour_redis_key
+           #print "hour_redis_key",self.redis_handle.llen(hour_redis_key)
            rollover_redis_key = self.rollover_list[name]["queue_name"]
-           print "rollover",self.rollover_list[name]["name"]
-           print "--->", self.redis_handle.llen(rollover_redis_key)
+           #print "rollover",self.rollover_list[name]["name"]
+           #print "--->", self.redis_handle.llen(rollover_redis_key)
            if self.redis_handle.llen(rollover_redis_key) > 0:
-                  print "---"
+                  #print "---"
                   self.redis_handle.delete(rollover_redis_key)
-           print "++++",self.redis_handle.llen(hour_redis_key)
+           #print "++++",self.redis_handle.llen(hour_redis_key)
 
            self.redis_handle.rename( hour_redis_key , rollover_redis_key)
-           print "len",self.redis_handle.llen(rollover_redis_key)
+           #print "len",self.redis_handle.llen(rollover_redis_key)
            return "DISABLE"
  
 
@@ -232,12 +232,12 @@ if __name__ == "__main__":
                     status_queue_class, moisture_app_classes, moisture_remote_classes , remote_classes )
    
 
-   #moisture_class.update_moisture_readings(None,None,None, None ) #populate data
+   moisture_class.update_moisture_readings(None,None,None, None ) #populate data
 
    #
    # Adding chains
    #
-   cf = py_cf.CF_Interpreter()
+   cf = py_cf_3.cf_interpreter.CF_Interpreter()
    
    #cf.define_chain("test",True)
    #cf.insert_link( "link_1", "SendEvent",    [ "HOUR_TICK",1 ] )
@@ -245,7 +245,7 @@ if __name__ == "__main__":
    #cf.insert_link( "link_3", "SendEvent",    [ "DAY_TICK", 1] )
    
 
-   cf.define_chain("update_moisture_readings",False)
+   cf.define_chain("update_moisture_readings",True)
    cf.insert_link( "link_1", "WaitEventCount",    [ "MINUTE_TICK",15,0 ] )
    cf.insert_link( "link_2", "One_Step",     [  moisture_class.update_moisture_readings ] )
    cf.insert_link( "link_3", "Reset", [] )
@@ -257,14 +257,14 @@ if __name__ == "__main__":
    cf.insert_link( "link_4", "Reset", [] )
 
 
-   cf.define_chain("update_hour_readings",False)
+   cf.define_chain("update_hour_readings",True)
    cf.insert_link( "link_1", "WaitEvent",    [ "HOUR_TICK" ] )
    cf.insert_link( "link_2", "One_Step",         [ moisture_class.hour_update ] )
    cf.insert_link( "link_4", "Reset", [] )
 
 
   
-   cf.define_chain("update_day_readings",False)
+   cf.define_chain("update_day_readings",True)
    cf.insert_link( "link_1", "WaitEvent",    [ "DAY_TICK" ] )
    cf.insert_link( "link_2", "One_Step",         [ moisture_class.day_update ] )
    cf.insert_link( "link_4", "Reset", [] )
@@ -285,7 +285,7 @@ if __name__ == "__main__":
   #
 
  
-   cf_environ = py_cf.Execute_Cf_Environment( cf )
+   cf_environ = py_cf_3.cf_interpreter.Execute_Cf_Environment( cf )
    cf_environ.execute()
 
 

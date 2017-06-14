@@ -35,7 +35,7 @@ class Build_Configuration(object):
 
    def check_namespace( self ):
        assert len(self.namespace) == 0, "unbalanced name space, current namespace: "+ json.dumps(self.namespace)
-       print "name space is in balance"
+       print( "name space is in balance")
       
    def add_info_node( self, label,name, properties = {}, json_flag= True ):
      properties["name"] = name
@@ -70,8 +70,8 @@ if __name__ == "__main__":
    bc.pop_namespace()
    bc.construct_node( True, "Level_1","Level_1","level12",{})
    bc.construct_node( True, "Level_2","level_2","level22",{} )
-   print redis.keys("*")
+   print (redis.keys("*"))
    common.delete_all()
-   print redis.keys("*")
+   print (redis.keys("*"))
 
 

@@ -7,9 +7,8 @@
 import json
 
 import redis
-from redis_graph.redis_graph_common   import Redis_Graph_Common
-from redis_graph.redis_graph_populate import Build_Configuration
-from farm_template        import Construct_Farm
+import redis_graph
+import farm_template        
 from redis_graph.redis_graph_query   import Query_Configuration
 import copy
  
@@ -17,8 +16,8 @@ class Graph_Management():
 
    def __init__( self , controller_name, io_server_name, data_store_name ):
       self.redis_handle  = redis.StrictRedis( host = "localhost", port=6379, db = 15 )   
-      self.common = Redis_Graph_Common( self.redis_handle)
-      self.qc = Query_Configuration( self.redis_handle, self.common )
+      self.common = redis_graph.redis_graph_common.Redis_Graph_Common( self.redis_handle)
+      self.qc = redis_graph.redis_graph_query.Query_Configuration( self.redis_handle, self.common )
       
       self.controller_name = controller_name
       self.io_server_name  = io_server_name
@@ -36,7 +35,7 @@ class Graph_Management():
             #print j, data[j]
             try:
                if json_flag == True:
-	            temp[j] = json.loads(data[j])
+                    temp[j] = json.loads(data[j])
                else:
                  temp[j] = data[j]
             except:
@@ -87,7 +86,7 @@ class Graph_Management():
            #print j, data[j]
            try:
              if json_flag == True:
-	        temp[j] = json.loads(data[j])
+                temp[j] = json.loads(data[j])
              else:
                  temp[j] = data[j]
            except:
@@ -122,7 +121,7 @@ class Graph_Management():
    def form_list_dict_from_keys( self, key, value_list, property_array):
        return_value = []
        for i in property_array:
-          print i.keys()
+          print (i.keys() )
           temp = {}
           for j  in value_list:
              temp[i[key]] = i[j]
@@ -132,7 +131,7 @@ class Graph_Management():
    def form_dict_from_keys( self, key, value, property_array):
        return_value = {}
        for i in property_array:
-          print i.keys()
+          print( i.keys() )
           return_value[i[key]] = i[value]
        return return_value
 
@@ -150,7 +149,7 @@ class Graph_Management():
            return self.cb_handlers.has_key(tag)
        except:
           #print "handlers:", type(self.cb_handlers)
-          print "tag", tag
+          print ("tag", tag )
           raise        
 
    def execute_cb_handlers( self, tag, value, parameters ):  # parameters is a list
@@ -159,12 +158,12 @@ class Graph_Management():
   
 if __name__ == "__main__" :
    redis_handle  = redis.StrictRedis( host = "localhost", port=6379, db = 15 )   
-   common = Redis_Graph_Common( redis_handle)
+   common = redis_graph.redis_graph_common.Redis_Graph_Common( redis_handle)
 
 
-   qc = Query_Configuration( redis_handle, common )
-   bc = Build_Configuration(redis_handle,common)
-   cf = Construct_Farm(redis_handle,common)
+   qc = redis_graph.redis_graph_query.Query_Configuration( redis_handle, common )
+   bc = redis_graph.redis_graph_populate.Build_Configuration(redis_handle,common)
+   cf = farm_template.Construct_Farm(redis_handle,common)
    
    #
    #
@@ -561,17 +560,17 @@ if __name__ == "__main__" :
 
 
    keys = redis_handle.keys("*")
-   print "len of keys",len(keys)
+   print ("len of keys",len(keys))
    '''
    for i in keys:
-      print "+++++++++++++:"
-      print i
+      print( "+++++++++++++:")
+      print( i )
       temp = i.split( common.sep)
-      print len(temp)
-      print redis_handle.hgetall(i)
-      print "----------------"
-   print "lenght",len(keys)
-   print "testing query functions"
+      print (len(temp))
+      print (redis_handle.hgetall(i))
+      print ("----------------")
+   print ("lenght",len(keys))
+   print ("testing query functions")
    '''
 
 
@@ -580,43 +579,43 @@ if __name__ == "__main__" :
    
 
    temp = qc.match_label_property(  "UDP_IO_SERVER", "name", "main_remote")
-   print "specific_match",len(temp),temp
+   print ("specific_match",len(temp),temp)
 
    temp = qc.match_label_property_generic(  "UDP_IO_SERVER", "name", "main_remote", "REMOTE_UNIT" )
-   print "general match", len(temp) ,temp
+   print ("general match", len(temp) ,temp)
   
-   print qc.match_labels( "UDP_IO_SERVER")
+   print  (qc.match_labels( "UDP_IO_SERVER"))
 
 
 
    temp= qc.match_label_property_specific( "UDP_IO_SERVER", "name", "main_remote", "REMOTE_UNIT", "name", "satellite_1")
-   print "specific property match", len(temp)
+   print ("specific property match", len(temp))
 
 
    temp = qc.match_label_property_generic(  "UDP_IO_SERVER", "name", "main_remote", "REMOTE_UNIT" )
-   print "general match", len(temp) #temp
+   print ("general match", len(temp))
 
    temp= qc.match_relationship_property_specific( "UDP_IO_SERVER", "name", "main_remote", "REMOTE_UNIT", "name", "satellite_1")
-   print "match relationship", len(temp) #temp
+   print ("match relationship", len(temp))
    
    temp = qc.match_relationship_property_generic(  "UDP_IO_SERVER", "name", "main_remote", "REMOTE_UNIT" )
-   print "general match", len(temp) #temp
+   print ("general match", len(temp)) 
    
    
    temp = qc.match_label_property_generic(  "UDP_IO_SERVER", "name", "main_remote", "REMOTE_UNIT" )
-   print "general match", len(temp) ,temp
+   print ("general match", len(temp) ,temp)
 
-   print "testing class functions"
+   print ("testing class functions")
 
    graph_management = Graph_Management("PI_1","main_remote","LaCima_DataStore" )
   
-   print len(graph_management.find_remotes_by_function( "moisture" ))
-   print len(graph_management.find_remotes_by_function( "irrigation"  ))
-   print len(graph_management.find_remotes_by_function( "flow_meter"  ))
-   print len(graph_management.find_remotes_by_function( "plc_current"  ))
-   print len(graph_management.find_remotes_by_function( "valve_current"  ))
-   print len(graph_management.find_remotes_by_function( "switches"  ))
-   print len(graph_management.find_remotes_by_function( "not found"  ))
+   print (len(graph_management.find_remotes_by_function( "moisture" )))
+   print (len(graph_management.find_remotes_by_function( "irrigation"  )))
+   print (len(graph_management.find_remotes_by_function( "flow_meter"  )))
+   print (len(graph_management.find_remotes_by_function( "plc_current"  )))
+   print (len(graph_management.find_remotes_by_function( "valve_current"  )))
+   print (len(graph_management.find_remotes_by_function( "switches"  )))
+   print (len(graph_management.find_remotes_by_function( "not found"  )))
 
 
  

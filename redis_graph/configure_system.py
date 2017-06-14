@@ -141,36 +141,36 @@ if __name__ == "__main__" :
    keys = redis.keys("*")
    
    for i in keys:
-      print "+++++++++++++:"
-      print i
+      print( "+++++++++++++:")
+      print (i)
       temp = i.split( common.sep)
-      print len(temp)
-      print redis.hgetall(i)
-      print "----------------"
-   print "lenght",len(keys)
-   print "testing query functions"
+      print (len(temp))
+      print (redis.hgetall(i))
+      print ("----------------")
+   print ("lenght",len(keys))
+   print ("testing query functions")
    
-   print qc.match_labels( "CONTROLLER" ) # match single item
+   print( qc.match_labels( "CONTROLLER" )) # match single item
    temp = qc.match_labels( "REMOTE" ) # match single item
-   print len(temp),temp
+   print( len(temp),temp)
 
-   print qc.match_relationship( "CONTROLLER" ) # match single item
+   print (qc.match_relationship( "CONTROLLER" )) # match single item
    temp = qc.match_relationship( "REMOTE" ) # match single item
-   print len(temp),temp
+   print (len(temp),temp)
 
    temp = qc.match_label_property( "REMOTE", "name", "satellite_1")
-   print len(temp),temp
+   print (len(temp),temp)
 
    temp= qc.match_label_property_specific( "CONTROLLER", "name", "PI_1", "REMOTE", "name", "satellite_1")
-   print len(temp),temp
+   print (len(temp),temp)
 
    temp = qc.match_label_property_generic(  "CONTROLLER", "name", "PI_1", "REMOTE" )
-   print len(temp),temp
+   print (len(temp),temp)
 
    temp= qc.match_relationship_property_specific( "CONTROLLER", "name", "PI_1", "REMOTE", "name", "satellite_1")
-   print len(temp),temp
+   print (len(temp),temp)
 
    temp = qc.match_relationship_property_generic(  "CONTROLLER", "name", "PI_1", "REMOTE" )
-   print len(temp),temp
+   print (len(temp),temp)
 
    common.delete_all()

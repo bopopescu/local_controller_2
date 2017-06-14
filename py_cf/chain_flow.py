@@ -48,7 +48,7 @@ class CF_Base_Interpreter():
   def find_chain_object( self, chain_name ):
      for i in self.chains:
        if chain_name == i["name"]:
-	 return i
+             return i
      return None
   
   def chain_to_list( self, chain):
@@ -67,8 +67,8 @@ class CF_Base_Interpreter():
           k["link_index"] = 0
           links = k["links"]
           for m in links:
-	     m["active_flag"] = True
-	     m["init_flag"] = True
+             m["active_flag"] = True
+             m["init_flag"] = True
 
 
   def resume_chain_code( self, chain ):
@@ -97,8 +97,8 @@ class CF_Base_Interpreter():
           k["active"] = False
           links = k["links"]
           for m in links:
-	     m["active_flag"] = False
-	     m["init_flag"] = True
+                m["active_flag"] = False
+                m["init_flag"] = True
 
   def enable_chain_base( self, chain ):
      chain = self.chain_to_list( chain)
@@ -110,8 +110,8 @@ class CF_Base_Interpreter():
           k["active"] = True
           links = k["links"]
           for m in links:
-	     m["active_flag"] = True
-	     m["init_flag"] = True
+             m["active_flag"] = True
+             m["init_flag"] = True
 
   def get_chain_state( self, chain ):
      assert type(chain) is str, "chain name is not a string"
@@ -134,7 +134,7 @@ class CF_Base_Interpreter():
      links = chain["links"]
      for i in links:
        if link == i["name"]:
-	 return i
+            return i
      return None
    
   def link_to_list( self, link):
@@ -186,7 +186,7 @@ class CF_Base_Interpreter():
     
     link = self.find_link_obect( chain, active_link )
     for i in range( 0, len(chain["links"])): 
-	chain["links"][i]["activeFlag"] = False
+            chain["links"][i]["activeFlag"] = False
    
     link["initFlag"] = True
     link["activeFlag"] = True
@@ -203,12 +203,12 @@ class CF_Base_Interpreter():
      for j in self.chains:
      
         if j["auto_start"]== True:
-	   j["link_index"] = 1
-	   j["active"] = True
-	   self.reset_chain(  j["name"] )
+           j["link_index"] = 1
+           j["active"] = True
+           self.reset_chain(  j["name"] )
 	   
-	else:
-           j["active"] = False
+        else:
+            j["active"] = False
 	
 	
 	
@@ -231,7 +231,7 @@ class CF_Base_Interpreter():
       loopFlag = True
       chain["link_index"] = 0
       while loopFlag == True:
-	loopFlag = self.execute_link( chain,event )      
+          loopFlag = self.execute_link( chain,event )      
       
  
   def execute_link( self, chain, event  ):
@@ -257,11 +257,11 @@ class CF_Base_Interpreter():
            init_event["name"] = "INIT"
            return_value = instruction(  self,  chain,parameters,  init_event )
 
-	   link["init_flag"] = False
+           link["init_flag"] = False
 	   #print "initialize",return_value
-	else:
-	   return_value = "CONTINUE"
-	   #print "no_init"
+        else:
+           return_value = "CONTINUE"
+           #print "no_init"
 	if (return_value != "DISABLE") and (return_value != "RESET"): 
           temp = instruction( self, chain,parameters,event)
           #print "temp",temp
