@@ -77,15 +77,15 @@ class Cup(object):
     def __init__(self, database, interval=120):
         self.interval = interval
         self.db = Database(database)
-        self.master = ServerBrowser(self)
-        self.updater = Thread(None, self.update_master)
+        self.main = ServerBrowser(self)
+        self.updater = Thread(None, self.update_main)
         self.updater.setDaemon(True)
         self.updater.start()
 
-    def update_master(self):
+    def update_main(self):
         wait = self.interval
         while 1:
-            if self.master.sync():
+            if self.main.sync():
                 wait = self.interval
             else:
                 wait = self.interval // 2

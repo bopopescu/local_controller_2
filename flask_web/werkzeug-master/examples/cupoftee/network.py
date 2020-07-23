@@ -40,10 +40,10 @@ class ServerBrowser(Syncable):
     def _sync(self):
         to_delete = set(self.servers)
         for x in xrange(1, 17):
-            addr = ('master%d.teeworlds.com' % x, 8300)
+            addr = ('main%d.teeworlds.com' % x, 8300)
             print addr
             try:
-                self._sync_master(addr, to_delete)
+                self._sync_main(addr, to_delete)
             except (socket.error, socket.timeout, IOError), e:
                 continue
         for server_id in to_delete:
@@ -52,7 +52,7 @@ class ServerBrowser(Syncable):
             raise IOError('no servers found')
         self.cup.db.sync()
 
-    def _sync_master(self, addr, to_delete):
+    def _sync_main(self, addr, to_delete):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.settimeout(5)
         s.sendto('\x20\x00\x00\x00\x00\x48\xff\xff\xff\xffreqt', addr)

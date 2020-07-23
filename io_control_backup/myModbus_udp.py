@@ -245,25 +245,25 @@ class Instrument_UDP():
                 'Given {0!r} and {1}.'.format(value, functioncode))
 
 
-        ## Build payload to slave ##
+        ## Build payload to subordinate ##
         if functioncode in [1, 2]:
-            payloadToSlave = self._numToTwoByteString(registeraddress) + \
+            payloadToSubordinate = self._numToTwoByteString(registeraddress) + \
                             self._numToTwoByteString(NUMBER_OF_BITS)
 
         elif functioncode in [3, 4,30,33]:
-            payloadToSlave = self._numToTwoByteString(registeraddress) + \
+            payloadToSubordinate = self._numToTwoByteString(registeraddress) + \
                             self._numToTwoByteString(numberOfRegisters)
 
         elif functioncode == 5:
-            payloadToSlave = self._numToTwoByteString(registeraddress) + \
+            payloadToSubordinate = self._numToTwoByteString(registeraddress) + \
                             self._createBitpattern(functioncode, value)
 
         elif functioncode == 6:
-            payloadToSlave = self._numToTwoByteString(registeraddress) + \
+            payloadToSubordinate = self._numToTwoByteString(registeraddress) + \
                             self._numToTwoByteString(value, numberOfDecimals, signed=signed)
 
         elif functioncode == 15:
-            payloadToSlave = self._numToTwoByteString(registeraddress) + \
+            payloadToSubordinate = self._numToTwoByteString(registeraddress) + \
                             self._numToTwoByteString(NUMBER_OF_BITS) + \
                             self._numToOneByteString(NUMBER_OF_BYTES_FOR_ONE_BIT) + \
                             self._createBitpattern(functioncode, value)
@@ -285,24 +285,24 @@ class Instrument_UDP():
                 registerdata = self._valuelistToBytestring(value, numberOfRegisters)
 
             assert len(registerdata) == numberOfRegisterBytes
-            payloadToSlave = self._numToTwoByteString(registeraddress) + \
+            payloadToSubordinate = self._numToTwoByteString(registeraddress) + \
                             self._numToTwoByteString(numberOfRegisters) + \
                             self._numToOneByteString(numberOfRegisterBytes) + \
                             registerdata
 
-        payloadFromSlave = self._performCommand(functioncode, payloadToSlave)
+        payloadFromSubordinate = self._performCommand(functioncode, payloadToSubordinate)
         if functioncode in [33]:
-            return payloadFromSlave
+            return payloadFromSubordinate
 
 
         ## Calculate return value ##
         if functioncode in [1, 2]:
-            registerdata = payloadFromSlave[NUMBER_OF_BYTES_BEFORE_REGISTERDATA:]
+            registerdata = payloadFromSubordinate[NUMBER_OF_BYTES_BEFORE_REGISTERDATA:]
  
             return self._bitResponseToValue(registerdata)
 
         if functioncode in [3, 4,30]:
-            registerdata = payloadFromSlave[NUMBER_OF_BYTES_BEFORE_REGISTERDATA:]
+            registerdata = payloadFromSubordinate[NUMBER_OF_BYTES_BEFORE_REGISTERDATA:]
 
             if payloadformat == PAYLOADFORMAT_STRING:
                 return self._bytestringToTextstring(registerdata, numberOfRegisters)
@@ -326,18 +326,18 @@ class Instrument_UDP():
     ##########################################
 
 
-    def _performCommand(self, functioncode, payloadToSlave):
+    def _performCommand(self, functioncode, payloadToSubordinate):
         DEFAULT_NUMBER_OF_BYTES_TO_READ = 1000
 
   
         # Build message
-        message = self._embedPayload(self.address, self.mode, functioncode, payloadToSlave)
+        message = self._embedPayload(self.address, self.mode, functioncode, payloadToSubordinate)
 
         # Calculate number of bytes to read
         number_of_bytes_to_read = DEFAULT_NUMBER_OF_BYTES_TO_READ
         if self.precalculate_read_size:
             try:
-                number_of_bytes_to_read = self._predictResponseSize(self.mode, functioncode, payloadToSlave)
+                number_of_bytes_to_read = self._predictResponseSize(self.mode, functioncode, payloadToSubordinate)
             except:
                 if self.debug:
                     template = 'MinimalModbus debug mode. Could not precalculate response size for Modbus {} mode. ' + \
@@ -349,8 +349,8 @@ class Instrument_UDP():
         response = self._communicate(message, number_of_bytes_to_read)
 
         # Extract payload
-        payloadFromSlave = self._extractPayload(response, self.address, self.mode, functioncode)
-        return payloadFromSlave
+        payloadFromSubordinate = self._extractPayload(response, self.address, self.mode, functioncode)
+        return payloadFromSubordinate
 
 
     def _communicate(self, message, number_of_bytes_to_read):
@@ -375,9 +375,9 @@ class Instrument_UDP():
 
 
 
-    def _embedPayload(self,slaveaddress, mode, functioncode, payloaddata):
+    def _embedPayload(self,subordinateaddress, mode, functioncode, payloaddata):
 
-      firstPart = self._numToOneByteString(slaveaddress) + self._numToOneByteString(functioncode) + payloaddata
+      firstPart = self._numToOneByteString(subordinateaddress) + self._numToOneByteString(functioncode) + payloaddata
 
       if mode == MODE_ASCII:
         message = _ASCII_HEADER + \
@@ -390,7 +390,7 @@ class Instrument_UDP():
       return message
 
 
-    def _extractPayload(self, response, slaveaddress, mode, functioncode):
+    def _extractPayload(self, response, subordinateaddress, mode, functioncode):
      BYTEPOSITION_FOR_ASCII_HEADER          = 0  # Relative to plain response
 
      BYTEPOSITION_FOR_SLAVEADDRESS          = 0  # Relative to (stripped) response
@@ -462,18 +462,18 @@ class Instrument_UDP():
                 response, plainresponse)
         raise ValueError(text)
 
-     # Check slave address
+     # Check subordinate address
      responseaddress = ord(response[BYTEPOSITION_FOR_SLAVEADDRESS])
 
-     if responseaddress != slaveaddress:
-        raise ValueError('Wrong return slave address: {} instead of {}. The response is: {!r}'.format( \
-            responseaddress, slaveaddress, response))
+     if responseaddress != subordinateaddress:
+        raise ValueError('Wrong return subordinate address: {} instead of {}. The response is: {!r}'.format( \
+            responseaddress, subordinateaddress, response))
 
      # Check function code
      receivedFunctioncode = ord(response[BYTEPOSITION_FOR_FUNCTIONCODE])
 
      if receivedFunctioncode == self._setBitOn(functioncode, BITNUMBER_FUNCTIONCODE_ERRORINDICATION):
-        raise ValueError('The slave is indicating an error. The response is: {!r}'.format(response))
+        raise ValueError('The subordinate is indicating an error. The response is: {!r}'.format(response))
 
      elif receivedFunctioncode != functioncode:
         print "receivedFunctioncode",receivedFunctioncode, functioncode
@@ -496,7 +496,7 @@ class Instrument_UDP():
 ############################################
 
 
-    def _predictResponseSize(mode, functioncode, payloadToSlave):
+    def _predictResponseSize(mode, functioncode, payloadToSubordinate):
      MIN_PAYLOAD_LENGTH = 4  # For implemented functioncodes here
      BYTERANGE_FOR_GIVEN_SIZE = slice(2, 4)  # Within the payload
 
@@ -515,7 +515,7 @@ class Instrument_UDP():
         response_payload_size = NUMBER_OF_PAYLOAD_BYTES_IN_WRITE_CONFIRMATION
 
      elif functioncode in [1, 2, 3, 4]:
-        given_size = self._twoByteStringToNum(payloadToSlave[BYTERANGE_FOR_GIVEN_SIZE])
+        given_size = self._twoByteStringToNum(payloadToSubordinate[BYTERANGE_FOR_GIVEN_SIZE])
         if functioncode == 1 or functioncode == 2:
             # Algorithm from MODBUS APPLICATION PROTOCOL SPECIFICATION V1.1b
             number_of_inputs = given_size
@@ -529,7 +529,7 @@ class Instrument_UDP():
 
      else:
         raise ValueError('Wrong functioncode: {}. The payload is: {!r}'.format( \
-            functioncode, payloadToSlave))
+            functioncode, payloadToSubordinate))
 
      # Calculate number of bytes to read
      if mode == MODE_ASCII:

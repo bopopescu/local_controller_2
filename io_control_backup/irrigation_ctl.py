@@ -1,8 +1,8 @@
 class IrrigationControl():
-   def __init__(self,  irrigation_devices=None, master_valve_list=None, plc_map=None , redis=None ):
+   def __init__(self,  irrigation_devices=None, main_valve_list=None, plc_map=None , redis=None ):
        self.redis              = redis
        self.irrigation_devices = irrigation_devices
-       self.master_valve_list  = master_valve_list
+       self.main_valve_list  = main_valve_list
        self.plc_map            = plc_map
 
    def disable_all_sprinklers( self,*arg ):
@@ -16,31 +16,31 @@ class IrrigationControl():
               
   
 
-   def turn_on_master_valves( self,*arg ):
+   def turn_on_main_valves( self,*arg ):
        self.redis.hset("CONTROL_VARIABLES","MASTER_VALVE_SETUP","ON")
-       print "master on"
-       for redis_key, device in self.master_valve_list.items():
+       print "main on"
+       for redis_key, device in self.main_valve_list.items():
            if self.plc_map.has_key( device["type"] ):
                plc = self.plc_map[ device["type"] ]
                remote = device["remote"]
-               valve_list = [device["master_valve"]]
+               valve_list = [device["main_valve"]]
                if len( valve_list ) > 0:
                    plc.turn_on_valves( remote, valve_list)
             
-   def turn_off_master_valves( self,*arg ):
+   def turn_off_main_valves( self,*arg ):
        self.redis.hset("CONTROL_VARIABLES","MASTER_VALVE_SETUP","OFF")
-       print "master off"
-       for redis_key, device in self.master_valve_list.items():
+       print "main off"
+       for redis_key, device in self.main_valve_list.items():
            if self.plc_map.has_key( device["type"] ):
                plc = self.plc_map[ device["type"] ]
                remote = device["remote"]
-               valve_list = [device["master_valve"]]
+               valve_list = [device["main_valve"]]
                if len( valve_list ) > 0:
                    plc.turn_off_valves( remote, valve_list)
     
 
    def turn_on_cleaning_valves( self,*arg ):
-       for redis_key, device in self.master_valve_list.items():
+       for redis_key, device in self.main_valve_list.items():
            if self.plc_map.has_key( device["type"] ):
                plc = self.plc_map[ device["type"] ]
                remote = device["remote"]
@@ -49,7 +49,7 @@ class IrrigationControl():
                    plc.turn_on_valves(  remote, valve_list)
             
    def turn_off_cleaning_valves( self,*arg ):
-       for redis_key, device in self.master_valve_list.items():
+       for redis_key, device in self.main_valve_list.items():
            if self.plc_map.has_key( device["type"] ):
                plc = self.plc_map[ device["type"] ]
                remote = device["remote"]
@@ -78,7 +78,7 @@ class IrrigationControl():
 
    def turn_off_io( self , io_setup ):
        # io_setup is a list of dict { "remote":xx , "bits":[1,2,3,4]
-       self.turn_off_master_valves()
+       self.turn_off_main_valves()
        for i in io_setup:      
            remote        = i["remote"]
            bits          = i["bits"]  # list of outputs on remote to turn off
@@ -98,7 +98,7 @@ class IrrigationControl():
            if self.plc_map.has_key( dev_type ):
                plc = self.plc_map[ dev_type ]
                plc.turn_on_valves( remote, bits )
-       self.turn_on_master_valves()
+       self.turn_on_main_valves()
 
 
    def turn_on_valve( self ,io_setup ):

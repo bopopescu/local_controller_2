@@ -128,11 +128,11 @@ class IO_mgr():
 
 
 class IrrigationIo():
-   def __init__(self, io_server, alarm_queue, remote_devices, master_valve_list,remote_io, plc_map ):
+   def __init__(self, io_server, alarm_queue, remote_devices, main_valve_list,remote_io, plc_map ):
        self.io_server           = io_server
        self.alarm_queue         = alarm_queue
        self.remote_devices      = remote_devices
-       self.master_valve_list   = master_valve_list
+       self.main_valve_list   = main_valve_list
        self.plc_map             = plc_map
        self.remote_io           = remote_io
 
@@ -145,30 +145,30 @@ class IrrigationIo():
               
   
 
-   def turn_on_master_valves( self,*arg ):
-       for master_valve in self.master_valve_list:
-           if master_valve["type"] == "CLICK":
-               address = remote_devices[ master_valve["remote"] ]["address"]
-               self.plc_map[master_valve["type"]].turn_on_master_valve( self.io_server,  address, master_valve )
+   def turn_on_main_valves( self,*arg ):
+       for main_valve in self.main_valve_list:
+           if main_valve["type"] == "CLICK":
+               address = remote_devices[ main_valve["remote"] ]["address"]
+               self.plc_map[main_valve["type"]].turn_on_main_valve( self.io_server,  address, main_valve )
             
     
-   def turn_off_master_valves( self,*arg ):
-       for master_valve in self.master_valve_list:
-           if master_valve["type"] == "CLICK":
-               address = remote_devices[ master_valve["remote"] ]["address"]
-               self.plc_map[master_valve["type"]].turn_off_master_valve( self.io_server,  address, master_valve )
+   def turn_off_main_valves( self,*arg ):
+       for main_valve in self.main_valve_list:
+           if main_valve["type"] == "CLICK":
+               address = remote_devices[ main_valve["remote"] ]["address"]
+               self.plc_map[main_valve["type"]].turn_off_main_valve( self.io_server,  address, main_valve )
 
    def turn_on_cleaning_valves( self,*arg ):
-       for master_valve in self.master_valve_list:
-           if master_valve["type"] == "CLICK":
-               address = remote_devices[ master_valve["remote"] ]["address"]
-               self.plc_map[master_valve["type"]].turn_on_cleaning_valve( self.io_server,  address, master_valve )
+       for main_valve in self.main_valve_list:
+           if main_valve["type"] == "CLICK":
+               address = remote_devices[ main_valve["remote"] ]["address"]
+               self.plc_map[main_valve["type"]].turn_on_cleaning_valve( self.io_server,  address, main_valve )
 
    def turn_off_cleaning_valves( self,*arg ):
-       for master_valve in self.master_valve_list:
-           if master_valve["type"] == "CLICK":
-               address = remote_devices[ master_valve["remote"] ]["address"]
-               self.plc_map[master_valve["type"]].turn_off_cleaning_valve( self.io_server,  address, master_valve )
+       for main_valve in self.main_valve_list:
+           if main_valve["type"] == "CLICK":
+               address = remote_devices[ main_valve["remote"] ]["address"]
+               self.plc_map[main_valve["type"]].turn_off_cleaning_valve( self.io_server,  address, main_valve )
 
 
  
@@ -196,7 +196,7 @@ class IrrigationIo():
 
    def turn_off_io( self , io_setup ):
       # io_setup is a list of dict { "remote":xx , "bits":[1,2,3,4]
-      self.turn_off_master_valves_server()
+      self.turn_off_main_valves_server()
       for i in io_setup:      
          remote        = i["remote"]
          remote_dev    = self.remote_devices[remote]
@@ -218,7 +218,7 @@ class IrrigationIo():
 
 
    def turn_on_io( self ,io_setup ):
-      self.turn_on_master_valves_server()
+      self.turn_on_main_valves_server()
       for i in io_setup:      
          remote        = i["remote"]
          remote_dev    = self.remote_devices[remote]
@@ -243,7 +243,7 @@ if __name__ == "__main__":
    modbus_udp               = modbus_UDP.ModbusUDPClient("192.168.1.84")
    alarm_queue              = AlarmQueue( redis )
    watch_dog_control        = WatchDogControl( modbus_udp, alarm_queue, remote_devices,  {"CLICK":plc_click} )
-   irrigation_control       = IrrigationIo( modbus_udp, alarm_queue, remote_devices,master_valve_list,irrigation_io, {"CLICK":plc_click} )
+   irrigation_control       = IrrigationIo( modbus_udp, alarm_queue, remote_devices,main_valve_list,irrigation_io, {"CLICK":plc_click} )
    io_mgr = IO_mgr( redis, modbus_udp, {"CLICK":plc_click}, remote_devices, gpio_input_devices, analog_devices, counter_devices )
    
    if watch_dog_control.modbus_check_mode_switches() == True:
@@ -260,12 +260,12 @@ if __name__ == "__main__":
    #print modbus_udp.read_bit(100,23)
    #print "disable_all_sprinkers",  irrigation_control.disable_all_sprinklers()
    #print modbus_udp.read_bit( 100, plc_click.click_bit_address["C1"])
-   #print "turn on master valve"
-   irrigation_control.turn_on_master_valves()
+   #print "turn on main valve"
+   irrigation_control.turn_on_main_valves()
    irrigation_control.turn_on_cleaning_valves()
    time.sleep(2)
    io_mgr.measure_analog()
-   #irrigation_control.turn_off_master_valves()
+   #irrigation_control.turn_off_main_valves()
    time.sleep(2)
    
    
@@ -275,16 +275,16 @@ if __name__ == "__main__":
 #   irrigation_control.load_duration_counters( 15 )
    
    io_mgr.clear_gpio_in()
-   print  io_mgr.measure_gpio_in_pin( "master_valve_set_switch" )
+   print  io_mgr.measure_gpio_in_pin( "main_valve_set_switch" )
    io_mgr.measure_gpio_in()
-   irrigation_control.turn_off_master_valves()
+   irrigation_control.turn_off_main_valves()
    irrigation_control.turn_off_cleaning_valves()
    time.sleep(2)
    print io_mgr.measure_analog_pin("coil_current" )
-   #irrigation_control.turn_on_master_valves()
+   #irrigation_control.turn_on_main_valves()
    #time.sleep(2)
    #io_mgr.measure_analog()
-   #irrigation_control.turn_off_master_valves()
+   #irrigation_control.turn_off_main_valves()
    #time.sleep(2)
    
 

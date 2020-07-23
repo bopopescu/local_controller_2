@@ -53,7 +53,7 @@ if __name__ == "__main__" :
    properties["moisture_list_store"]         =   "MOISTURE_1_DATA_STORE"
    properties["air_temp_list_store"]         =   "MOISTURE_1_AIR_TEMP_LIST_STORE"
    properties["roll_over_list_store"]        =   "MOISTURE_1_ROLL_OVER_LIST_STORE"
-   properties["slave_controller_address"]    =    40
+   properties["subordinate_controller_address"]    =    40
    cf.add_info_node( "MOISTURE_CTR","moisture_1", properties = properties, json_flag= True )
  
    cf.end_header_node("MOISTURE_CONTROLLERS")
@@ -140,7 +140,7 @@ if __name__ == "__main__" :
    properties["modbus_remote"] = "satellite_1"
    properties["m_tag"]          = "read_input_bit"
    properties["parameters"]     = [ "X002"]
-   properties["exec_tag"  ]     = ["get_gpio","master_valve_set_switch"]
+   properties["exec_tag"  ]     = ["get_gpio","main_valve_set_switch"]
    
    cf.add_info_node( "FIFTEEN_SEC_ELEMENT","MASTER_VALVE_SWITCH_SET",properties=properties, json_flag=True)
 
@@ -149,7 +149,7 @@ if __name__ == "__main__" :
    properties["modbus_remote"] = "satellite_1"
    properties["m_tag"]          = "read_input_bit"
    properties["parameters"]     = [ "X003"]
-   properties["exec_tag"  ]     = ["get_gpio","master_valve_reset_switch"]
+   properties["exec_tag"  ]     = ["get_gpio","main_valve_reset_switch"]
    
    cf.add_info_node( "FIFTEEN_SEC_ELEMENT","MASTER_VALVE_SWITCH_RESET",properties=properties, json_flag=True)
 

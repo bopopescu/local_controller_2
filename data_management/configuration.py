@@ -36,19 +36,19 @@ irrigation_io["satellite_1"] =  { "remote":  "satellite_1", "type":"CLICK" ,"pin
 irrigation_io["satellite_2"] =  {  "remote": "satellite_2"  , "type":"CLICK" ,"pins_number":22, "unknown":"C201", "clear_duration_counters":"C2","duration_counter":"DS2", "turn_off_bit":"C1"}
 irrigation_io["satellite_3"] =  {  "remote": "satellite_3" , "type":"CLICK" ,"pins_number":22, "unknown":"C201", "clear_duration_counters":"C2","duration_counter":"DS2"  ,"turn_off_bit":"C1"}
 
-master_valve_list = {}
-master_valve_list["satellite_1"] =  { "type":"CLICK", "remote":"satellite_1","master_valve":43, "cleaning_valve":44 } 
+main_valve_list = {}
+main_valve_list["satellite_1"] =  { "type":"CLICK", "remote":"satellite_1","main_valve":43, "cleaning_valve":44 } 
 #
-#  debouncing is handled by slave device
+#  debouncing is handled by subordinate device
 #  latching is enabled or disabled
 #  latching consists of High or Low Latching
 #
 gpio_bit_input_devices = {}
-gpio_bit_input_devices["master_valve_set_switch"]   =  {"type":"CLICK", "remote":"satellite_1","input_bit":"X002", "latch_enable":True ,"latch_high":True }
-gpio_bit_input_devices["master_valve_reset_switch"] =  {"type":"CLICK", "remote":"satellite_1","input_bit":"X003", "latch_enable":True,"latch_high":True } 
+gpio_bit_input_devices["main_valve_set_switch"]   =  {"type":"CLICK", "remote":"satellite_1","input_bit":"X002", "latch_enable":True ,"latch_high":True }
+gpio_bit_input_devices["main_valve_reset_switch"] =  {"type":"CLICK", "remote":"satellite_1","input_bit":"X003", "latch_enable":True,"latch_high":True } 
 
-master_switch_keys = [ "master_valve_set_switch" ]
-master_reset_keys  = [ "master_valve_reset_switch"]
+main_switch_keys = [ "main_valve_set_switch" ]
+main_reset_keys  = [ "main_valve_reset_switch"]
 
 analog_devices = {}
 analog_devices["plc_current"]    = { "type":"CLICK", "remote":"satellite_1", "read_register":"DF1", "conversion_factor":1.0 }

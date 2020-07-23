@@ -67,7 +67,7 @@ class Data_Acquisition(object):
 
        data_dict = {}
        for i in data_list:
-           temp_data =   self.slave_interface( i)
+           temp_data =   self.subordinate_interface( i)
            data_dict[i["name"]] = temp_data
        data_dict["namespace"] = self.gm.convert_namespace(store_element["namespace"])
        data_dict["time_stamp"] = time.strftime( "%b %d %Y %H:%M:%S",time.localtime(time.time()))
@@ -88,12 +88,12 @@ class Data_Acquisition(object):
            if i.has_key("init_tag") == True:
                self.gm.execute_cb_handlers( i["init_tag"][0], None , i["init_tag"])
 
-   def slave_interface( self, element_descriptor ):
+   def subordinate_interface( self, element_descriptor ):
     
-       action_function = self.load_slave_element( element_descriptor )
+       action_function = self.load_subordinate_element( element_descriptor )
        if action_function != None:
             # find modbus address
-            modbus_address = self.slave_dict[element_descriptor["modbus_remote"]]["modbus_address"]
+            modbus_address = self.subordinate_dict[element_descriptor["modbus_remote"]]["modbus_address"]
             return_value = action_function( modbus_address, element_descriptor["parameters"])
        else:
             return_value = None     
@@ -105,43 +105,43 @@ class Data_Acquisition(object):
             pass
        return return_value
  
-   def load_slave_element(self, list_item):
+   def load_subordinate_element(self, list_item):
        return_value = None
        
        remote = list_item["modbus_remote"]
-       if self.slave_dict.has_key(remote):
-           slave_element = self.slave_dict[remote]
-           slave_class   = slave_element["class"]
-           m_tags = slave_class.m_tags
+       if self.subordinate_dict.has_key(remote):
+           subordinate_element = self.subordinate_dict[remote]
+           subordinate_class   = subordinate_element["class"]
+           m_tags = subordinate_class.m_tags
            if m_tags.has_key(list_item["m_tag"]):
               return_value = m_tags[list_item["m_tag"]]
 
        return return_value
      
    
-   def verify_slave_tags( self):
+   def verify_subordinate_tags( self):
       #print "day list keys",len(self.daily_list)
       for i in self.daily_list:
-         self.verify_slave_element(i)
+         self.verify_subordinate_element(i)
       #print "hour list keys",len(self.hour_list)
       for i in self.hour_list:
-         self.verify_slave_element(i)
+         self.verify_subordinate_element(i)
       #print "minute list keys",len(self.minute_list)
       for i in self.minute_list:
-         self.verify_slave_element(i)
+         self.verify_subordinate_element(i)
       for i in self.fifteen_list:
-         self.verify_slave_element(i)
+         self.verify_subordinate_element(i)
 
 
-   def verify_slave_element(self, list_item):
+   def verify_subordinate_element(self, list_item):
        #print "list_item",type(list_item),list_item
        try:
            remote = list_item["modbus_remote"]
            print "remote",remote
            if remote != "skip_controller":
-                slave_element = self.slave_dict[remote]
-                slave_class   = slave_element["class"]
-                m_tags        = slave_class.m_tags
+                subordinate_element = self.subordinate_dict[remote]
+                subordinate_class   = subordinate_element["class"]
+                m_tags        = subordinate_class.m_tags
                 m_tag_function = m_tags[list_item["m_tag"]]
            if list_item.has_key("init_tag"):
               init_tag = list_item["init_tag"][0]
@@ -256,11 +256,11 @@ def construct_class( redis_handle,
 
    status_queue_class = rabbit_cloud_status_publish.Status_Queue(redis_handle, queue_name )
 
-   slave_nodes  = gm.match_relationship(  "REMOTE_UNIT", json_flag = True)
-   slave_dict    = {}
-   for i in slave_nodes:
+   subordinate_nodes  = gm.match_relationship(  "REMOTE_UNIT", json_flag = True)
+   subordinate_dict    = {}
+   for i in subordinate_nodes:
      class_inst     = remote_classes.find_class( i["type"] )
-     slave_dict[i["name"]] = { "modbus_address": i["modbus_address"], "type":i["type"], "class":class_inst }
+     subordinate_dict[i["name"]] = { "modbus_address": i["modbus_address"], "type":i["type"], "class":class_inst }
  
 
    
@@ -278,18 +278,18 @@ def construct_class( redis_handle,
    data_acquisition.instrument              = instrument
    data_acquisition.remote_classes          = remote_classes
    data_acquisition.status_queue_class      = status_queue_class
-   data_acquisition.slave_dict              = slave_dict
+   data_acquisition.subordinate_dict              = subordinate_dict
    data_acquisition.fifteen_store           = fifteen_store
    data_acquisition.fifteen_list            = fifteen_list
 
    #
    #
-   #  Verifying graph vs slave nodes
+   #  Verifying graph vs subordinate nodes
    #
    #
    #
    #
-   data_acquisition.verify_slave_tags()
+   data_acquisition.verify_subordinate_tags()
    data_acquisition.execute_init_tags( minute_list )
    data_acquisition.execute_init_tags( hour_list   )
    data_acquisition.execute_init_tags( daily_list )

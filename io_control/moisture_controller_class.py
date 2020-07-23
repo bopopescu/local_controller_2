@@ -23,10 +23,10 @@ from  psoc_4m_base_class import PSOC_BASE_4M
 
 class Moisture_Controller():
     
-    def __init__(self,new_instrument, slave_id, ip, port = 5005  ):
+    def __init__(self,new_instrument, subordinate_id, ip, port = 5005  ):
         self.name            = name
         self.new_instrument = new_instrument
-        self.slave_id       = slave_id
+        self.subordinate_id       = subordinate_id
         self.ip             = ip
         self.port           = port
                           
@@ -34,13 +34,13 @@ class Moisture_Controller():
 
 class PSOC_4M_MOISTURE_UNIT(PSOC_BASE_4M):
 
-   def __init__(self, ip,port,slave_address, instrument ):
+   def __init__(self, ip,port,subordinate_address, instrument ):
        self.ip = ip
        self.port = port
-       self.slave_address = slave_address
+       self.subordinate_address = subordinate_address
        self.instrument = instrument
        self.system_id = 0x201
-       PSOC_BASE_4M.__init__( self,ip,port,slave_address, instrument, self.system_id)
+       PSOC_BASE_4M.__init__( self,ip,port,subordinate_address, instrument, self.system_id)
        
        # additional write address definitions definitions
        self.check_one_wire_presence_addr                     = 27
@@ -109,7 +109,7 @@ class PSOC_4M_MOISTURE_UNIT(PSOC_BASE_4M):
        return_value = {}
        self.instrument.set_ip( self.ip,self.port )
 
-       data =  self.instrument.read_registers( self.slave_address,  self.status_start, len(self.status_list) )
+       data =  self.instrument.read_registers( self.subordinate_address,  self.status_start, len(self.status_list) )
 
        for i in range(0,len(self.status_list)):
           
@@ -123,7 +123,7 @@ class PSOC_4M_MOISTURE_UNIT(PSOC_BASE_4M):
    def read_moisture_control(self  ):
        return_value = {}
        self.instrument.set_ip( self.ip,self.port )
-       data =  self.instrument.read_floats( self.slave_address,  self.moisture_control_start, len(self.moisture_control_list) )
+       data =  self.instrument.read_floats( self.subordinate_address,  self.moisture_control_start, len(self.moisture_control_list) )
 
        for i in range(0,len(self.moisture_control_list)):
           
@@ -137,14 +137,14 @@ class PSOC_4M_MOISTURE_UNIT(PSOC_BASE_4M):
    def read_moisture_data( self  ):
         return_value = {}
         self.instrument.set_ip( self.ip,self.port )
-        data =  self.instrument.read_floats( self.slave_address,  self.moisture_data_start ,self.moisture_configuration_number  )
+        data =  self.instrument.read_floats( self.subordinate_address,  self.moisture_data_start ,self.moisture_configuration_number  )
         return data
         
          
    def read_moisture_resistive_data( self  ):
         return_value = {}
         self.instrument.set_ip( self.ip,self.port )
-        data =  self.instrument.read_floats( self.slave_address,  self.moisture_data_resistive_start ,self.moisture_resistive_configuration_number  )
+        data =  self.instrument.read_floats( self.subordinate_address,  self.moisture_data_resistive_start ,self.moisture_resistive_configuration_number  )
         return data
         
         
@@ -156,32 +156,32 @@ class PSOC_4M_MOISTURE_UNIT(PSOC_BASE_4M):
    def read_moisture_configuration( self ):
        return_value = {}
        self.instrument.set_ip( self.ip,self.port )
-       data = self.instrument.read_registers( self.slave_address, self.moisture_configuration_start, self.moisture_configuration_number )
+       data = self.instrument.read_registers( self.subordinate_address, self.moisture_configuration_start, self.moisture_configuration_number )
        return data
        
   
    def check_one_wire_presence ( self): #sampling rate is in minutes
          self.instrument.set_ip( self.ip,self.port )
-         self.instrument.write_registers(self.slave_address, self.check_one_wire_presence_addr, [0] )
+         self.instrument.write_registers(self.subordinate_address, self.check_one_wire_presence_addr, [0] )
          
    def make_soil_temperature ( self ): #sampling rate is in minutes
          self.instrument.set_ip( self.ip,self.port )
-         self.instrument.write_registers(self.slave_address, self.make_soil_temperature_addr, [0] )
+         self.instrument.write_registers(self.subordinate_address, self.make_soil_temperature_addr, [0] )
          
    def make_air_temp_humidity( self): #sampling rate is in minutes
          self.instrument.set_ip( self.ip,self.port )
-         self.instrument.write_registers(self.slave_address, self.make_air_temp_humidity_addr, [0] )
+         self.instrument.write_registers(self.subordinate_address, self.make_air_temp_humidity_addr, [0] )
 
   
    def clear_new_moisture_data_flag( self ):
        self.instrument.set_ip( self.ip,self.port )
-       self.instrument.write_registers( self.slave_address, self.clear_moisture_flag_addr, [0] )
+       self.instrument.write_registers( self.subordinate_address, self.clear_moisture_flag_addr, [0] )
        
  
    
    def force_moisture_reading ( self): #sampling rate is in minutes
          self.instrument.set_ip( self.ip,self.port )
-         self.instrument.write_registers( self.slave_address, self.force_moisture_reading_addr, [0] )
+         self.instrument.write_registers( self.subordinate_address, self.force_moisture_reading_addr, [0] )
          
         
    def  update_moisture_sensor_configuration ( self, sensor_data ): # sensor data consisting of 0,1,2
@@ -192,7 +192,7 @@ class PSOC_4M_MOISTURE_UNIT(PSOC_BASE_4M):
           if i not in valid_data:
              raise ValueError("Bad Value for Sensor should be 0,1 or 2 Got "+i)
         self.instrument.set_ip( self.ip,self.port )  
-        self.instrument.write_registers( self.slave_address, self.update_moisture_sensor_configuration_addr ,sensor_data )
+        self.instrument.write_registers( self.subordinate_address, self.update_moisture_sensor_configuration_addr ,sensor_data )
   
 
 

@@ -76,8 +76,8 @@ class Sprinkler_Control():
      temp["RESTART_PROGRAM"]           = self.restart_program
      temp["NATIVE_SPRINKLER"]          = self.direct_valve_control       
      temp["CLEAN_FILTER"]              = self.clean_filter
-     temp["OPEN_MASTER_VALVE"]         = self.open_master_valve
-     temp["CLOSE_MASTER_VALVE"]        = self.close_master_valve
+     temp["OPEN_MASTER_VALVE"]         = self.open_main_valve
+     temp["CLOSE_MASTER_VALVE"]        = self.close_main_valve
      temp["RESET_SYSTEM"]              = self.reset_system
      temp["CHECK_OFF"]                 = self.check_off
      temp["SHUT_DOWN"]                 = self.shut_down
@@ -116,12 +116,12 @@ class Sprinkler_Control():
         self.store_event_queue( "check_off", { "action":"start" } )
         self.redis.set( "sprinkler_ctrl_mode","CHECK_OFF")
         self.io.disable_all_sprinklers()
-        self.io.turn_on_master_valves()
+        self.io.turn_on_main_valves()
         
         time.sleep(90)
         self.measure_flow_rate ( chainFlowHandle, chainObj, parameters,event )
         self.measure_flow_rate (  chainFlowHandle, chainObj, parameters,event )
-        self.close_master_valve( data_object, chainFlowHandle,chainObj, parameters,event )
+        self.close_main_valve( data_object, chainFlowHandle,chainObj, parameters,event )
         print "off flow rate ",int(self.redis.get( "global_flow_sensor" ))*self.flow_scale
         if int(self.redis.get( "global_flow_sensor" ))*self.flow_scale   > 2:
            self.redis.set("SHUT_DOWN",1)
@@ -139,14 +139,14 @@ class Sprinkler_Control():
         print "check_off start"
         self.redis.set( "sprinkler_ctrl_mode","CHECK_OFF")
         self.io.disable_all_sprinklers()
-        self.io.turn_on_master_valves()
+        self.io.turn_on_main_valves()
         time.sleep(90)
         self.measure_flow_rate ( chainFlowHandle, chainObj, parameters,event )
         print "made 1"
         time.sleep(60)
         print "made 2 "
         self.measure_flow_rate (  chainFlowHandle, chainObj, parameters,event )
-        self.close_master_valve( 2,chainFlowHandle,chainObj, parameters,event )
+        self.close_main_valve( 2,chainFlowHandle,chainObj, parameters,event )
         print "made 3"
         temp = int(self.redis.get( "global_flow_sensor" ))*self.flow_scale
         if temp   > 2:
@@ -165,8 +165,8 @@ class Sprinkler_Control():
   #"OFFLINE" 
   def offline_command( self, data_object, chainFlowHandle,chainObj, parameters,event ):
       self.redis.set( "sprinkler_ctrl_mode","OFFLINE")
-      self.close_master_valve( data_object, chainFlowHandle,chainObj, parameters,event )
-      chainFlowHandle.disable_chain_base( ["master_valve_timed_off","monitor_irrigation_cell","monitor_irrigation_job_queue"])
+      self.close_main_valve( data_object, chainFlowHandle,chainObj, parameters,event )
+      chainFlowHandle.disable_chain_base( ["main_valve_timed_off","monitor_irrigation_cell","monitor_irrigation_job_queue"])
       chainFlowHandle.enable_chain_base( ["monitor_irrigation_job_queue"])
       self.io.disable_all_sprinklers()
       self.clear_redis_sprinkler_data()
@@ -225,15 +225,15 @@ class Sprinkler_Control():
        schedule_name = "Clean_Filter"
        self.redis.set( "schedule_name",schedule_name)
        self.io.turn_off_cleaning_valves()
-       self.io.turn_on_master_valves()
+       self.io.turn_on_main_valves()
        time.sleep(90)  # let line charge up
-       self.io.turn_off_master_valves()
+       self.io.turn_off_main_valves()
        time.sleep(5)
        self.io.turn_on_cleaning_valves()
        time.sleep(20)
-       self.io.turn_on_master_valves()
+       self.io.turn_on_main_valves()
        time.sleep(10)
-       self.io.turn_off_master_valves()
+       self.io.turn_off_main_valves()
        self.io.turn_off_cleaning_valves()
        self.store_event_queue( "clean_filter", { "action":"stop" } )
        self.redis.set("schedule_name",temp)
@@ -246,15 +246,15 @@ class Sprinkler_Control():
        self.store_event_queue( "clean_filter", { "action":"start" } )
        self.redis.set( "schedule_name",schedule_name)
        self.io.turn_off_cleaning_valves()
-       self.io.turn_on_master_valves()
+       self.io.turn_on_main_valves()
        time.sleep(90)  # let line charge up
-       self.io.turn_off_master_valves()
+       self.io.turn_off_main_valves()
        time.sleep(5)
        self.io.turn_on_cleaning_valves()
        time.sleep(20)
-       self.io.turn_on_master_valves()
+       self.io.turn_on_main_valves()
        time.sleep(10)
-       self.io.turn_off_master_valves()
+       self.io.turn_off_main_valves()
        self.io.turn_off_cleaning_valves()
        self.store_event_queue( "clean_filter", { "action":"stop" } )
        self.redis.set("schedule_name",temp)
@@ -262,17 +262,17 @@ class Sprinkler_Control():
        self.redis.set("cleaning_sum",0)
   # tested  
   #"OPEN_MASTER_VALVE"
-  def open_master_valve( self, data_object, chainFlowHandle, chainObj, parameters, event ):
-      #print "made and open master valuve"
-      self.io.turn_on_master_valves()
-      chainFlowHandle.disable_chain_base([ "master_valve_timed_off"])
-      chainFlowHandle.enable_chain_base( ["master_valve_timed_off" ])
+  def open_main_valve( self, data_object, chainFlowHandle, chainObj, parameters, event ):
+      #print "made and open main valuve"
+      self.io.turn_on_main_valves()
+      chainFlowHandle.disable_chain_base([ "main_valve_timed_off"])
+      chainFlowHandle.enable_chain_base( ["main_valve_timed_off" ])
      
   # tested  
   #"CLOSE_MASTER_VALVE"  
-  def close_master_valve( self, data_object, chainFlowHandle, chainObj, parameters, event ):
-      chainFlowHandle.disable_chain_base( ["master_valve_timed_off"])
-      self.io.turn_off_master_valves()
+  def close_main_valve( self, data_object, chainFlowHandle, chainObj, parameters, event ):
+      chainFlowHandle.disable_chain_base( ["main_valve_timed_off"])
+      self.io.turn_off_main_valves()
       
     
  
@@ -988,9 +988,9 @@ class Valve_Control():
   def check_switches_set( self, chainFlowHandle, chainObj, parameters, event ):
       returnValue = False
       if  event['name'] == 'TIME_TICK':
-          temp = int(redis.get("master_valve_set_switch"))
+          temp = int(redis.get("main_valve_set_switch"))
           if temp != 0: 
-               redis.set("master_valve_set_switch",0)
+               redis.set("main_valve_set_switch",0)
                returnValue = True
           else:
                returnValue = False
@@ -1000,33 +1000,33 @@ class Valve_Control():
   def detect_switch_off( self, chainFlowHandle, chainObj, parameters, event ):
       returnValue = "CONTINUE"
       if  event['name'] == 'TIME_TICK' :
-          temp = int(redis.get("master_valve_reset_switch"))
+          temp = int(redis.get("main_valve_reset_switch"))
           if temp != 0: 
-             redis.set("master_valve_reset_switch",1)
-             chainFlowHandle.disable_chain_base( ["master_valve_timed_off"] )
+             redis.set("main_valve_reset_switch",1)
+             chainFlowHandle.disable_chain_base( ["main_valve_timed_off"] )
              returnValue = "HALT"
       return returnValue
   
   
   def turn_on( self, chainFlowHandle, chainObj, parameters, event ):
-           self.io.turn_on_master_valves()
+           self.io.turn_on_main_valves()
   
   def turn_off_if_no_in_queue( self, chainFlowHandle, chainObj, parameters, event ):
         length =   self.redis.llen( "IRRIGATION_CELL_QUEUE" )
         if length == 0 :
-          self.io.turn_off_master_valves()
+          self.io.turn_off_main_valves()
           self.io.turn_off_cleaning_valves()
   
   
   def verify_off_switch_not_set( self, chainFlowHandle, chainObj, parameters, event ):
       returnValue = True
       if  event['name'] == 'TIME_TICK' :
-             temp = int(redis.get("master_valve_reset_switch"))
+             temp = int(redis.get("main_valve_reset_switch"))
              if temp != 0: 
                 returnValue = False
                 length =   self.redis.llen( "IRRIGATION_CELL_QUEUE" )
                 if length == 0:
-                  self.io.turn_off_master_valves()
+                  self.io.turn_off_main_valves()
              else:
                returnValue = True
       return returnValue
@@ -1110,16 +1110,16 @@ class Remote_Io():
       temp["command"] = "turn_off_cleaning_valves"
       self.do_rpc( temp )
   #tested
-  def turn_on_master_valves( self ):
+  def turn_on_main_valves( self ):
       self.redis.set( "MASTER_VALVE_SETUP","ON")
       temp = {}
-      temp["command"] = "turn_on_master_valves"
+      temp["command"] = "turn_on_main_valves"
       self.do_rpc( temp )
   #tested
-  def turn_off_master_valves( self ):
+  def turn_off_main_valves( self ):
       self.redis.set( "MASTER_VALVE_SETUP","OFF")
       temp = {}
-      temp["command"] = "turn_off_master_valves"
+      temp["command"] = "turn_off_main_valves"
       self.do_rpc( temp )
   #tested
   def turn_on_io( self , io_setup ):
@@ -1168,7 +1168,7 @@ class Remote_Io():
     
   #tested
   def disable_all_sprinklers( self ):
-      self.turn_off_master_valves()
+      self.turn_off_main_valves()
       temp = {}
       temp["command"] = "disable_all_sprinklers"
       temp["time" ]  = 2000 # 20 second wait
@@ -1228,7 +1228,7 @@ if __name__ == "__main__":
    modbus_udp               = modbus_UDP.ModbusUDPClient("192.168.1.84")
    alarm_queue              = AlarmQueue( redis )
    watch_dog_control        = WatchDogControl( modbus_udp, alarm_queue, remote_devices,{"CLICK":plc_click} )
-   #irrigation_control       = IrrigationControl( modbus_udp, alarm_queue, remote_devices,master_valve_list,remote_io, {"CLICK":plc_click} )
+   #irrigation_control       = IrrigationControl( modbus_udp, alarm_queue, remote_devices,main_valve_list,remote_io, {"CLICK":plc_click} )
 
 
 
@@ -1240,7 +1240,7 @@ if __name__ == "__main__":
            self.modbus_udp                   = modbus_UDP.ModbusUDPClient(redis_io_ip)
            self.alarm_queue                  = AlarmQueue( self.handle )
            self.watch_dog_control            = WatchDogControl( modbus_udp, alarm_queue, remote_devices,{"CLICK":plc_click} )
-           #self.irrigation_io                = IrrigationControl( modbus_udp, alarm_queue, remote_devices,master_valve_list,remote_io, {"CLICK":plc_click} )
+           #self.irrigation_io                = IrrigationControl( modbus_udp, alarm_queue, remote_devices,main_valve_list,remote_io, {"CLICK":plc_click} )
            self.device_directory             = "WD_DIRECTORY"
            self.app_files                    = app_files
            self.system_files                 = system_files
@@ -1314,14 +1314,14 @@ if __name__ == "__main__":
    cf.insert_link( "link_1", "WaitTod", ["*",13,"*","*"] )
    cf.insert_link( "link_2", "One_Step", [ ir_ctl.sprinkler_control.irrigation_io.disable_all_sprinklers ] )
    cf.insert_link( "link_3", "One_Step", [ ir_ctl.sprinkler_control.irrigation_io.turn_off_cleaning_valves ] )
-   cf.insert_link( "link_4", "One_Step", [ ir_ctl.sprinkler_control.irrigation_io.turn_on_master_valves ] )
+   cf.insert_link( "link_4", "One_Step", [ ir_ctl.sprinkler_control.irrigation_io.turn_on_main_valves ] )
    cf.insert_link( "link_5", "WaitTime", [100] )
-   cf.insert_link( "link_6", "One_Step", [ ir_ctl.sprinkler_control.irrigation_io.turn_off_master_valves ] ) 
+   cf.insert_link( "link_6", "One_Step", [ ir_ctl.sprinkler_control.irrigation_io.turn_off_main_valves ] ) 
    cf.insert_link( "link_7", "One_Step", [ ir_ctl.sprinkler_control.irrigation_io.turn_on_cleaning_valves ] )   
    cf.insert_link( "link_8", "WaitTime", [40] )    
-   cf.insert_link( "link_9", "One_Step", [ ir_ctl.sprinkler_control.irrigation_io.turn_on_master_valves ] )    
+   cf.insert_link( "link_9", "One_Step", [ ir_ctl.sprinkler_control.irrigation_io.turn_on_main_valves ] )    
    cf.insert_link( "link_10", "WaitTime", [20] )
-   cf.insert_link( "link_11", "One_Step",  [ ir_ctl.sprinkler_control.irrigation_io.turn_off_master_valves ] ) 
+   cf.insert_link( "link_11", "One_Step",  [ ir_ctl.sprinkler_control.irrigation_io.turn_off_main_valves ] ) 
    cf.insert_link( "link_12", "One_Step",  [ ir_ctl.sprinkler_control.irrigation_io.turn_off_cleaning_valves ] )
    cf.insert_link( "link_13", "One_Step", [ ir_ctl.sprinkler_control.irrigation_io.disable_all_sprinklers ] )
    cf.insert_link( "link_14", "WaitTod", ["*",14,"*","*" ] )
@@ -1355,7 +1355,7 @@ if __name__ == "__main__":
 
 
 
-   cf.define_chain("manual_master_valve_on",True)
+   cf.define_chain("manual_main_valve_on",True)
    cf.insert_link( "link_0",   "Log",["start"] )
    cf.insert_link( "link_1",    "Code", [ ir_ctl.valve_control.turn_off_if_no_in_queue ])
    cf.insert_link( "link_test", "Log",["valve off"] )
@@ -1370,7 +1370,7 @@ if __name__ == "__main__":
    cf.insert_link( "link_9",    "Reset",    [] )
   
   
-   cf.define_chain("master_valve_timed_off",False)
+   cf.define_chain("main_valve_timed_off",False)
    cf.insert_link( "link_1",  "Code", [  ir_ctl.valve_control.detect_switch_off ] )
    cf.insert_link( "link_4",    "One_Step", [ ir_ctl.valve_control.turn_on] )
    cf.insert_link( "link_2",  "Code", [ ir_ctl.valve_control.insure_that_valve_on ] )
@@ -1402,7 +1402,7 @@ if __name__ == "__main__":
 #ir_ctl.plc_watch_dog.modbus_read_wd_flag( None,None,None,None)
 #ir_ctl.plc_watch_dog.modbus_write_wd_flag( None,None,None,None)
 #ir_ctl.remote_io.construct_modbus_counters()
-#ir_ctl.remote_io.turn_off_master_valves()
+#ir_ctl.remote_io.turn_off_main_valves()
 #ir_ctl.remote_io.clean_filter()
 #ir_ctl.remote_io.disable_all_sprinklers()
 #io_setup = [["satellite_1", [12], 10]]

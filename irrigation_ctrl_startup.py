@@ -117,7 +117,7 @@ class SprinklerQueueElementControl( ):
 
        self.io_control.load_duration_counters( run_time  )
        #print "made it here"
-       self.io_control.turn_on_master_valves()
+       self.io_control.turn_on_main_valves()
        self.io_control.turn_on_io(  json_object["io_setup"] )
        station_by_pass = 0       
        
@@ -169,7 +169,7 @@ class SprinklerQueueElementControl( ):
        if (elasped_time <= run_time ) and ( self.check_redis_value("SKIP_STATION") != "ON" ):
            
            self.io_control.turn_on_io( json_object["io_setup"] )
-           self.io_control.turn_on_master_valves()
+           self.io_control.turn_on_main_valves()
           
            self.redis.hset( "CONTROL_VARIABLES","schedule_time_count", elasped_time )
            json_object["elasped_time"] = elasped_time
@@ -198,7 +198,7 @@ class SprinklerQueueElementControl( ):
        self.io_control.turn_off_io(json_object["io_setup"])
        self.io_control.disable_all_sprinklers()
        self.io_control.clear_duration_counters()
-       self.io_control.turn_off_master_valves()
+       self.io_control.turn_off_main_valves()
        
 
    def log_sensors(self,  schedule_name,step):
@@ -518,8 +518,8 @@ class SprinklerControl():
        self.commands["NATIVE_SCHEDULE"]          = self.queue_schedule_step_time      
        self.commands["NATIVE_SPRINKLER"]          = self.direct_valve_control       
        self.commands["CLEAN_FILTER"]              = self.clean_filter            #tested    
-       self.commands["OPEN_MASTER_VALVE"]         = self.open_master_valve       #tested     
-       self.commands["CLOSE_MASTER_VALVE"]        = self.close_master_valve      #tested    
+       self.commands["OPEN_MASTER_VALVE"]         = self.open_main_valve       #tested     
+       self.commands["CLOSE_MASTER_VALVE"]        = self.close_main_valve      #tested    
        self.commands["RESET_SYSTEM"]              = self.reset_system            #tested    
        self.commands["CHECK_OFF"]                 = self.check_off               #tested          
        self.commands["SUSPEND"]                   = self.suspend                 #tested   
@@ -553,7 +553,7 @@ class SprinklerControl():
 
    def suspend( self, *args ):
        self.alarm_queue.store_past_action_queue("SUSPEND_OPERATION","YELLOW"  )
-       self.irrigation_control.turn_off_master_valves()
+       self.irrigation_control.turn_off_main_valves()
        self.irrigation_control.disable_all_sprinklers()
        self.redis.hset("CONTROL_VARIABLES","SUSPEND","ON")
 
@@ -596,7 +596,7 @@ class SprinklerControl():
    def go_offline( self, object_data,chainFlowHandle, chainObj, parameters,event ):
        self.alarm_queue.store_past_action_queue("OFFLINE","RED"  )
        self.redis.hset("CONTROL_VARIABLES","sprinkler_ctrl_mode","OFFLINE")
-       self.irrigation_control.turn_off_master_valves()
+       self.irrigation_control.turn_off_main_valves()
        self.irrigation_control.disable_all_sprinklers()
        self.clear_redis_sprinkler_data()
        self.clear_redis_irrigate_queue()
@@ -636,7 +636,7 @@ class SprinklerControl():
        self.alarm_queue.store_past_action_queue("DIAGNOSTICS_SCHEDULE_STEP_TIME","YELLOW" , {"schedule_name":self.schedule_name, "schedule_step":self.schedule_step,"schedule_time":self.schedule_step_time})
        self.schedule_step             = int(self.schedule_step)
        self.schedule_step_time        = int(self.schedule_step_time)  
-       self.irrigation_control.turn_off_master_valves()
+       self.irrigation_control.turn_off_main_valves()
        self.irrigation_control.disable_all_sprinklers()
        self.clear_redis_sprinkler_data()
        self.clear_redis_irrigate_queue()
@@ -658,7 +658,7 @@ class SprinklerControl():
        schedule_step_time = int(schedule_step_time) 
        self.alarm_queue.store_past_action_queue("DIRECT_VALVE_CONTROL","YELLOW" ,{"remote":remote,"pin":pin,"time":schedule_step_time }) 
        #print "made it here",object_data
-       self.irrigation_control.turn_off_master_valves()
+       self.irrigation_control.turn_off_main_valves()
        self.irrigation_control.disable_all_sprinklers()
        self.clear_redis_sprinkler_data()
        self.clear_redis_irrigate_queue()
@@ -670,18 +670,18 @@ class SprinklerControl():
        
 
 
-   def open_master_valve( self, object_data,chainFlowHandle, chainObj, parameters,event ):
+   def open_main_valve( self, object_data,chainFlowHandle, chainObj, parameters,event ):
        self.alarm_queue.store_past_action_queue("OPEN_MASTER_VALVE","YELLOW" )
-       self.irrigation_control.turn_on_master_valves()
-       chainFlowHandle.enable_chain_base([ "monitor_master_on_web"])
+       self.irrigation_control.turn_on_main_valves()
+       chainFlowHandle.enable_chain_base([ "monitor_main_on_web"])
 
      
   
-   def close_master_valve( self, object_data,chainFlowHandle, chainObj, parameters,event ):
+   def close_main_valve( self, object_data,chainFlowHandle, chainObj, parameters,event ):
        self.alarm_queue.store_past_action_queue("CLOSE_MASTER_VALVE","GREEN"  )
-       chainFlowHandle.disable_chain_base( ["manual_master_valve_on_chain"])
-       chainFlowHandle.disable_chain_base( ["monitor_master_on_web"])
-       self.irrigation_control.turn_off_master_valves()
+       chainFlowHandle.disable_chain_base( ["manual_main_valve_on_chain"])
+       chainFlowHandle.disable_chain_base( ["monitor_main_on_web"])
+       self.irrigation_control.turn_off_main_valves()
       
     
  
@@ -1041,7 +1041,7 @@ if __name__ == "__main__":
                                                             gpio_reg_input_devices=None, gpio_reg_output_devices= None,
                                                             analog_devices=analog_devices, counter_devices=counter_devices )
 
-   irrigation_io_control     = io_control_backup.irrigation_ctl.IrrigationControl( irrigation_io, master_valve_list, plc_map, redis )
+   irrigation_io_control     = io_control_backup.irrigation_ctl.IrrigationControl( irrigation_io, main_valve_list, plc_map, redis )
    plc_watch_dog_interface   = io_control_backup.irrigation_ctl.WatchDogControl( remote_devices, plc_map )
    plc_watch_dog             = PLC_WATCH_DOG( redis, alarm_queue,plc_watch_dog_interface )
 
@@ -1088,7 +1088,7 @@ if __name__ == "__main__":
 
    def detect_on_switch_on( self,*args):
        
-       for i in master_switch_keys:
+       for i in main_switch_keys:
            try:
               value = int(redis.hget("GPIO_BITS",i))
              
@@ -1102,8 +1102,8 @@ if __name__ == "__main__":
 
 
    def detect_off_switches(*args):
-       #print "detect off", master_reset_keys
-       for i in master_reset_keys:
+       #print "detect off", main_reset_keys
+       for i in main_reset_keys:
            
            try:
               value = int(redis.hget("GPIO_BITS",i))
@@ -1119,11 +1119,11 @@ if __name__ == "__main__":
 
 
    def clear_redis_set_keys( *args):
-       for i in master_switch_keys:
+       for i in main_switch_keys:
            redis.hset("GPIO_BITS",i,0)
 
    def clear_redis_clear_keys( *args):
-       for i in master_reset_keys:
+       for i in main_reset_keys:
            redis.hset("GPIO_BITS",i,0)
 
 
@@ -1200,9 +1200,9 @@ if __name__ == "__main__":
                 pin    = str(k[1][0])
                 update_entry( remote_dictionary, pin_dictionary, remote,pin, schedule ,  dictionary )
 
-       master_valve = sys_files.load_file("master_valve_setup.json")
+       main_valve = sys_files.load_file("main_valve_setup.json")
 
-       for j in master_valve:
+       for j in main_valve:
 	  remote = j[0]
           pin    = str(j[1][0])
           update_entry( remote_dictionary, pin_dictionary, remote,pin, schedule ,  dictionary )         
@@ -1319,18 +1319,18 @@ if __name__ == "__main__":
    cf.insert_link( "link_2",   "One_Step",         [ monitor.set_suspend ])
    cf.insert_link( "link_3",   "One_Step",         [ irrigation_io_control.disable_all_sprinklers ] )
    cf.insert_link( "link_4",   "One_Step",         [ irrigation_io_control.turn_off_cleaning_valves ] )# turn off cleaning valve
-   cf.insert_link( "link_5",   "One_Step",         [ irrigation_io_control.turn_on_master_valves ] )# turn turn on master valve
+   cf.insert_link( "link_5",   "One_Step",         [ irrigation_io_control.turn_on_main_valves ] )# turn turn on main valve
    cf.insert_link( "link_6",   "WaitTime",         [120,0,0,0] )
    cf.insert_link( "link_1",   "Log",           ["Clean Step 3"] )
    cf.insert_link( "link_7",   "One_Step",         [ irrigation_io_control.turn_on_cleaning_valves ] )# turn on cleaning valve
-   cf.insert_link( "link_8",   "One_Step",         [ irrigation_io_control.turn_off_master_valves ] )# turn turn off master valve
+   cf.insert_link( "link_8",   "One_Step",         [ irrigation_io_control.turn_off_main_valves ] )# turn turn off main valve
    cf.insert_link( "link_9",   "WaitTime",         [30,0,0,0] ) 
    cf.insert_link( "link_1",   "Log",           ["Clean Step 4"] ) 
-   cf.insert_link( "link_10",  "One_Step",         [ irrigation_io_control.turn_on_master_valves ] )# turn turn on master valve
+   cf.insert_link( "link_10",  "One_Step",         [ irrigation_io_control.turn_on_main_valves ] )# turn turn on main valve
    cf.insert_link( "link_11",  "WaitTime",         [10,0,0,0] )
    cf.insert_link( "link_1",   "Log",           ["Clean Step 5"] )
-   cf.insert_link( "link_12",  "One_Step",         [ irrigation_io_control.turn_off_cleaning_valves ] )# turn turn off master valve
-   cf.insert_link( "link_13",  "One_Step",         [ irrigation_io_control.turn_off_master_valves ] )# turn turn off cleaning valve
+   cf.insert_link( "link_12",  "One_Step",         [ irrigation_io_control.turn_off_cleaning_valves ] )# turn turn off main valve
+   cf.insert_link( "link_13",  "One_Step",         [ irrigation_io_control.turn_off_main_valves ] )# turn turn off cleaning valve
    cf.insert_link( "link_14",  "One_Step",         [ irrigation_io_control.disable_all_sprinklers ] )
    cf.insert_link( "link_15",  "One_Step",         [ monitor.clear_cleaning_sum ] )
    cf.insert_link( "link_16",  "One_Step",         [ monitor.set_resume ])
@@ -1351,59 +1351,59 @@ if __name__ == "__main__":
    cf.insert_link( "link_16",  "One_Step",      [ monitor.set_suspend ] )
    cf.insert_link( "link_2",   "One_Step",      [ irrigation_io_control.disable_all_sprinklers ] )
    cf.insert_link( "link_3",   "WaitTime",      [15,0,0,0] )
-   cf.insert_link( "link_4",   "One_Step",      [ irrigation_io_control.turn_on_master_valves ] )# turn turn on master valve
-   cf.insert_link( "link_5",   "One_Step",      [ irrigation_io_control.turn_off_cleaning_valves ] )# turn turn off master valve
+   cf.insert_link( "link_4",   "One_Step",      [ irrigation_io_control.turn_on_main_valves ] )# turn turn on main valve
+   cf.insert_link( "link_5",   "One_Step",      [ irrigation_io_control.turn_off_cleaning_valves ] )# turn turn off main valve
    cf.insert_link( "link_6",   "WaitTime",      [300,0,0,0] ) 
    cf.insert_link( "link_7",   "Code",          [ check_off ] )
    cf.insert_link( "link_16",  "One_Step",         [ monitor.set_resume ])
-   cf.insert_link( "link_8",   "One_Step",      [ irrigation_io_control.turn_off_master_valves ] )# turn turn on master valve
+   cf.insert_link( "link_8",   "One_Step",      [ irrigation_io_control.turn_off_main_valves ] )# turn turn on main valve
    cf.insert_link( "link_9",  "Terminate",     [] )
         
-   cf.define_chain("manual_master_valve_on_chain",False) #tested
-   #cf.insert_link( "link_1",    "Log",                  ["manual master"] )
+   cf.define_chain("manual_main_valve_on_chain",False) #tested
+   #cf.insert_link( "link_1",    "Log",                  ["manual main"] )
    cf.insert_link( "link_2",    "Code",                 [ monitor.verify_resume ])
-   cf.insert_link( "link_3",    "One_Step",             [ irrigation_io_control.turn_on_master_valves ] )
-   cf.insert_link( "link_4",    "One_Step",             [ irrigation_io_control.turn_off_cleaning_valves ] )# turn turn off master valve
+   cf.insert_link( "link_3",    "One_Step",             [ irrigation_io_control.turn_on_main_valves ] )
+   cf.insert_link( "link_4",    "One_Step",             [ irrigation_io_control.turn_off_cleaning_valves ] )# turn turn off main valve
    cf.insert_link( "link_5",    "WaitTime",             [ 5,0,0,0] ) # wait 1 seconds
    cf.insert_link( "link_6",    "Reset",                [] )
 
-   cf.define_chain("monitor_master_on_switch",False) #TBD
+   cf.define_chain("monitor_main_on_switch",False) #TBD
    #cf.insert_link("link_1",  "WaitTime",             [5,0,0,0] ) 
    #cf.insert_link("link_2",  "Code",                 [ detect_on_switch_on ] )
    #cf.insert_link("link_3",  "One_Step",             [ clear_redis_set_keys ] )
-   #cf.insert_link("link_4",  "Enable_Chain",         [["manual_master_valve_on_chain"]] )
-   #cf.insert_link("link_5",  "Enable_Chain",         [["manual_master_valve_off_chain"]] )
+   #cf.insert_link("link_4",  "Enable_Chain",         [["manual_main_valve_on_chain"]] )
+   #cf.insert_link("link_5",  "Enable_Chain",         [["manual_main_valve_off_chain"]] )
    #cf.insert_link("link_6",  "WaitTime",             [3600*8,0,0,0] ) # wait 8 hours
-   #cf.insert_link("link_7",  "Disable_Chain",        [["manual_master_valve_on_chain"]] )
-   #cf.insert_link("link_8",  "One_Step",             [ irrigation_io_control.turn_off_master_valves ])   
+   #cf.insert_link("link_7",  "Disable_Chain",        [["manual_main_valve_on_chain"]] )
+   #cf.insert_link("link_8",  "One_Step",             [ irrigation_io_control.turn_off_main_valves ])   
    #cf.insert_link("link_9",  "Reset",                [])
    cf.insert_link("link_9",  "Halt",                [])
 
 
-   cf.define_chain("monitor_master_on_web",False) #TBD
-   cf.insert_link( "link_0",    "Log",                  ["monitor master on web"] )
-   cf.insert_link("link_1",  "Enable_Chain",         [["manual_master_valve_on_chain"]] )
+   cf.define_chain("monitor_main_on_web",False) #TBD
+   cf.insert_link( "link_0",    "Log",                  ["monitor main on web"] )
+   cf.insert_link("link_1",  "Enable_Chain",         [["manual_main_valve_on_chain"]] )
    cf.insert_link("link_2",  "WaitTime",             [ 3600*8,0,0,0] ) # wait 8 hour
-   cf.insert_link("link_3",  "Enable_Chain",         [["manual_master_valve_on_chain"]] )
-   cf.insert_link("link_4",  "Disable_Chain",        [["manual_master_valve_off_chain"]] )
-   cf.insert_link("link_5",  "One_Step",             [ irrigation_io_control.turn_off_master_valves ])   
-   cf.insert_link("link_6",  "Disable_Chain",        [["monitor_master_on_web"]] )
+   cf.insert_link("link_3",  "Enable_Chain",         [["manual_main_valve_on_chain"]] )
+   cf.insert_link("link_4",  "Disable_Chain",        [["manual_main_valve_off_chain"]] )
+   cf.insert_link("link_5",  "One_Step",             [ irrigation_io_control.turn_off_main_valves ])   
+   cf.insert_link("link_6",  "Disable_Chain",        [["monitor_main_on_web"]] )
   
 
      
 
 
-   cf.define_chain("manual_master_valve_off_chain",False ) #TBD
+   cf.define_chain("manual_main_valve_off_chain",False ) #TBD
    cf.insert_link("link_1",    "WaitTime",             [5,0,0,0] ) 
    #cf.insert_link("link_1",    "Code",                 [ detect_switch_off ] )
    #cf.insert_link("link_2",    "One_Step",             [ clear_redis_clear_keys ] )
    #cf.insert_link("link_3",    "One_Step",             [ clear_redis_set_keys ] )
-   #cf.insert_link("link_4",    "Enable_Chain",         [["monitor_master_on_switch"]] ) 
-   #cf.insert_link("link_5",    "Disable_Chain",        [["manual_master_valve_on_chain"]] ) 
-   #cf.insert_link("link_6",    "Disable_Chain",        [["monitor_master_on_web"]] )     
-   #cf.insert_link("link_7",    "One_Step",             [ irrigation_io_control.turn_off_master_valves ] )# turn turn on master valve
-   #cf.insert_link("link_8",    "One_Step",             [ irrigation_io_control.turn_off_cleaning_valves ] )# turn turn off master valve
-   cf.insert_link("link_6",    "Disable_Chain",        [["manual_master_valve_off_chain"]] )
+   #cf.insert_link("link_4",    "Enable_Chain",         [["monitor_main_on_switch"]] ) 
+   #cf.insert_link("link_5",    "Disable_Chain",        [["manual_main_valve_on_chain"]] ) 
+   #cf.insert_link("link_6",    "Disable_Chain",        [["monitor_main_on_web"]] )     
+   #cf.insert_link("link_7",    "One_Step",             [ irrigation_io_control.turn_off_main_valves ] )# turn turn on main valve
+   #cf.insert_link("link_8",    "One_Step",             [ irrigation_io_control.turn_off_cleaning_valves ] )# turn turn off main valve
+   cf.insert_link("link_6",    "Disable_Chain",        [["manual_main_valve_off_chain"]] )
 
 
    cf.define_chain("gpm_triggering_clean_filter",True) #TBDf

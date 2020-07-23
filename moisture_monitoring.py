@@ -63,7 +63,7 @@ class Moisture_Control(object):
        list_data = []
        
        for value in self.moisture_app_classes:
-           modbus_address = value["slave_controller_address"]
+           modbus_address = value["subordinate_controller_address"]
            driver = self.find_driver( modbus_address )
            self.update_a_reading( value, driver, list_data )
            
